@@ -2,6 +2,8 @@ package com.huntto.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +12,10 @@ import javax.persistence.Id;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @ApiModel
+@Builder
 public class FeedBack {
 
     @Id
@@ -26,7 +30,8 @@ public class FeedBack {
     @ApiModelProperty(hidden = true)
     private String UPDATE_TIME;// 修改时间
     @ApiModelProperty(hidden = true)
-    private String IS_CL; // 是否处理 0未处理 1已处理
+    @Builder.Default
+    private String IS_CL = "0"; // 是否处理 0未处理 1已处理
     @ApiModelProperty(hidden = true)
     private String MEDI_INTID; // 体检机构id
 
