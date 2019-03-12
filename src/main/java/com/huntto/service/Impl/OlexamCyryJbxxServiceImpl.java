@@ -411,23 +411,28 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
                 CyryVo3 cyryVo3 = (CyryVo3) list.get(0);
                 if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
                     photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                    int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
-                    log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                    if (count != 1) {
-                        log.error("更新cyryquery 表的 FEATURE数据失败");
-                    } else {
-                        // 调用对比接口API获取相似度
+                    if(photoFeature1 == null) {
+                    	log.error("没有获取到数据库的人脸头像特征");
+                    	return map;
+                    }else {
+                    	int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
+                    	log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+                    	if (count != 1) {
+                    		log.error("更新cyryquery 表的 FEATURE数据失败");
+                    	} else {
+                    		// 调用对比接口API获取相似度
 //                        photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                        if(cyryVo3.getFEATURE() == null) {
-                        	log.error("没有获取到数据库的人脸头像特征");
-                        	float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-                        	if(similarity > 70) {
-                        		idcard = cyryVo3.getIDCARD();
-                        		return getJKZXXbyIdcard(idcard);
-                        	}else {
-                        		return map;
-                        	}
-                        }
+                    		if(cyryVo3.getFEATURE() == null) {
+                    			log.error("没有获取到数据库的人脸头像特征");
+                    			float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
+                    			if(similarity > 70) {
+                    				idcard = cyryVo3.getIDCARD();
+                    				return getJKZXXbyIdcard(idcard);
+                    			}else {
+                    				return map;
+                    			}
+                    		}
+                    	}
                     }
                 } else {
                 	// 调用对比接口API获取相似度
@@ -448,10 +453,15 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
                 for (CyryVo3 cyryVo3 : list) {
                     if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
                         photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                        int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
-                        log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                        if (count != 1) {
-                            log.error("更新cyryquery 表的 FEATURE数据失败");
+                        if(photoFeature1 == null) {
+                        	log.error("没有获取到数据库的人脸头像特征");
+                        	return map;
+                        }else {
+                        	int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
+                        	log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+                        	if (count != 1) {
+                        		log.error("更新cyryquery 表的 FEATURE数据失败");
+                        	}
                         }
                     }
                 }
@@ -610,8 +620,11 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         image.data = photo;
         image.format = ImageFormat.ImageFormat_UNKNOWN;
         Face faces[] = faceDetect.detectPicture(image);
-
-        return faceRegister.extractFeature(image, faces[0], ModelType.MODEL_SMALL);
+        if(faces != null) {
+        	return faceRegister.extractFeature(image, faces[0], ModelType.MODEL_SMALL);
+        }else {
+        	return null;
+        }
     }
 
     /**
