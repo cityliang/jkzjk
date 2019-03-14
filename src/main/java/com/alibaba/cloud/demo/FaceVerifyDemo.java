@@ -5,7 +5,9 @@ package com.alibaba.cloud.demo;
 
 import com.alibaba.cloud.faceengine.Error;
 import com.alibaba.cloud.faceengine.*;
-
+/**
+ * 线下SDK人脸对比demo
+ */
 public class FaceVerifyDemo {
     private static int RunMode = Mode.TERMINAL;
 

@@ -3,7 +3,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-
+/**
+ * 加载SDKdll  授权码验证
+ */
 public class Utils {
     public static final String VENDOR_KEY = "eyJ2ZW5kb3JJZCI6ImNlc2hpX3ZlbmRvciIsInJvbGUiOjIsImNvZGUiOiIzRDE5RUIwNjY1OEE5MUExQzlCNDY0MzhDN0QwNDFGMyIsImV4cGlyZSI6IjIwMTkwMzMxIiwidHlwZSI6MX0=";
     public static String PICTURE_ROOT = "./pictures/";

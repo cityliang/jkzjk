@@ -5,7 +5,9 @@ package com.alibaba.cloud.demo;
 
 import com.alibaba.cloud.faceengine.Error;
 import com.alibaba.cloud.faceengine.*;
-
+/**
+ * 线下SDK人脸识别demo
+ */
 public class FaceRecognizeDemo {
     private static int RunMode = Mode.TERMINAL;
     //private static int RunMode = Mode.CLOUD;

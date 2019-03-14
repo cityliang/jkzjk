@@ -16,7 +16,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-
+/**
+ * 线上人脸对比demo
+ */
 public class Demo_face_verify {
 	 /*
      * 计算MD5+BASE64
