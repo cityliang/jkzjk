@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.axis.providers.java.MsgProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -133,7 +134,7 @@ public class CyryController {
 	public String getPersonMsg3(String NAME,String idCard) throws JsonProcessingException {
 		Map map;
 		String json = "";
-		
+		ObjectMapper mapper;
 		if(Nulls.isNotEmpty(NAME) && Nulls.isEmpty(idCard)) {// 姓名不为空，身份证号为空
 			map = olexamCyryJbxxService.getCYRYbyName1(NAME);
 			if(map.containsKey("list")) {
@@ -168,27 +169,25 @@ public class CyryController {
 				
 				map = toMapList(list,map);
 				if (null != map && !"{}".equals(map.toString())) {
-					ObjectMapper mapper = new ObjectMapper();
+					mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
 				} else if ("{}".equals(map.toString())) {
 					json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 				} else {
 					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 				}
-			}else {
-				if (null != map && !"{}".equals(map.toString())) {
-					if("不合格".equals(map.get("TJJG"))) {
-						json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
-					}else {
-						ObjectMapper mapper = new ObjectMapper();
-						json = mapper.writeValueAsString(map);
-					}
+			}else if (null != map && !"{}".equals(map.toString())) {
+				if("不合格".equals(map.get("TJJG"))) {
+					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
+				}else {
+					mapper = new ObjectMapper();
+					json = mapper.writeValueAsString(map);
+				}
 				} else if ("{}".equals(map.toString())) {
 					json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 				} else {
 					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 				}
-			}
 		}else if((Nulls.isNotEmpty(NAME) && Nulls.isNotEmpty(idCard)) || 
 				 (Nulls.isEmpty(NAME) && Nulls.isNotEmpty(idCard))) {// 姓名不为空，身份证号不为空 或 姓名为空，身份证号不为空 
 			if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
@@ -197,7 +196,7 @@ public class CyryController {
 					if("不合格".equals(map.get("TJJG"))) {
 						json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
 					}else {
-						ObjectMapper mapper = new ObjectMapper();
+						mapper = new ObjectMapper();
 						json = mapper.writeValueAsString(map);
 					}
 				} else if ("{}".equals(map.toString())) {
@@ -274,8 +273,6 @@ public class CyryController {
 		if (Nulls.validateValue(IDCARD, FBType, FBContent)) {
 			int count = feedBackService.insertFeedBack(IDCARD, FBType, FBContent);
 			if (1 == count) {
-//				ObjectMapper mapper = new ObjectMapper();
-//				json = mapper.writeValueAsString(map);
 				json = JsonUtil.jsonStr("msg", "反馈成功");
 			} else {
 				json = JsonUtil.jsonStr("msg", "反馈失败");
@@ -344,8 +341,6 @@ public class CyryController {
 		if (Nulls.validateValue(feedBack.getIS_CL(), feedBack.getID())) {
 			int count = feedBackService.updateFeedBack(feedBack);
 			if (1 == count) {
-//				ObjectMapper mapper = new ObjectMapper();
-//				json = mapper.writeValueAsString(map);
 				json = JsonUtil.jsonStr("msg", "更新数据成功");
 			} else {
 				json = JsonUtil.jsonStr("msg", "更新数据失败");
@@ -359,7 +354,7 @@ public class CyryController {
 	
 	/**
 	 * 人脸识别验证接口
-	 *
+	 * 在线调用 /face/verify
 	 * @param NAME 体检人员姓名
 	 * @param PHOTO 体检人员头像
 	 * @return String
@@ -373,9 +368,52 @@ public class CyryController {
 	public String faceRecognition(String NAME,String PHOTO) throws JsonProcessingException {
 		String json = "";
 		if (Nulls.validateValue(NAME,PHOTO)) {
-			Map map;
-			map = olexamCyryJbxxService.verifyPicture(NAME,PHOTO);
+			Map map = olexamCyryJbxxService.verifyPicture(NAME,PHOTO);
 			if (null != map && !"{}".equals(map.toString())) {
+				if(map.containsKey("msg")) {
+					String mString = String.valueOf(map.get("msg"));
+					json = JsonUtil.jsonStr("msg", mString);
+				}
+				if("不合格".equals(map.get("TJJG"))) {
+					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
+				}else {
+					ObjectMapper mapper = new ObjectMapper();
+					json = mapper.writeValueAsString(map);
+				}
+			} else if ("{}".equals(map.toString())) {
+				json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+			} else {
+				json = JsonUtil.jsonStr("msg", "该用户没有健康证");
+			}
+		} else {
+			json = JsonUtil.jsonStr("msg", "姓名和头像不正确，请重试！");
+		}
+		return json;
+	}
+	
+	/**
+	 * 人脸识别验证接口
+	 * 离线SDK调用   已弃用
+	 * @param NAME 体检人员姓名
+	 * @param PHOTO 体检人员头像
+	 * @return String
+	 * @throws JsonProcessingException JsonProcessingException
+	 */
+	@Deprecated
+	@ApiOperation(value = "人脸识别验证接口", notes = "用来获取人员健康证信息")
+	@ApiImplicitParams({
+	@ApiImplicitParam(paramType = "query", name = "NAME", value = "体检人员姓名", dataType = "String", required = true),
+	@ApiImplicitParam(paramType = "query", name = "PHOTO", value = "体检人员头像", dataType = "String", required = true)})
+	@RequestMapping(value = { "/faceRecognition1" }, method = RequestMethod.POST)
+	public String faceRecognition1(String NAME,String PHOTO) throws JsonProcessingException {
+		String json = "";
+		if (Nulls.validateValue(NAME,PHOTO)) {
+			Map map = olexamCyryJbxxService.verifyPicture1(NAME,PHOTO);
+			if (null != map && !"{}".equals(map.toString())) {
+				if(map.containsKey("msg")) {
+					String mString = String.valueOf(map.get("msg"));
+					json = JsonUtil.jsonStr("msg", mString);
+				}
 				if("不合格".equals(map.get("TJJG"))) {
 					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
 				}else {

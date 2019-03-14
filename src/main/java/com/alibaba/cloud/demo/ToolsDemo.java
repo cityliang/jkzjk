@@ -58,11 +58,13 @@ public class ToolsDemo {
         Face[] faces2 = faceDetect.detectPicture(image2);
 
         String featureStr1 = faceRegister.extractFeature(image1, faces1[0], ModelType.MODEL_SMALL);
+        System.out.println("featureStr1: "+featureStr1);
         if (featureStr1 == null) {
             throw new RuntimeException("extractFeature image1 error");
         }
 
         String featureStr2 = faceRegister.extractFeature(image2, faces2[0], ModelType.MODEL_SMALL);
+        System.out.println("featureStr2: "+featureStr2);
         if (featureStr2 == null) {
             throw new RuntimeException("extractFeature image2 error");
         }
@@ -103,11 +105,13 @@ public class ToolsDemo {
         Face[] faces2 = faceDetect.detectPicture(image2);
 
         String featureStr1 = faceRegister.extractFeature(image1, faces1[0], ModelType.MODEL_SMALL);
+        System.out.println("featureStr1: "+featureStr1);
         if (featureStr1 == null) {
             throw new RuntimeException("extractFeature image1 error");
         }
 
         String featureStr2 = faceRegister.extractFeature(image2, faces2[0], ModelType.MODEL_SMALL);
+        System.out.println("featureStr2: "+featureStr2);
         if (featureStr2 == null) {
             throw new RuntimeException("extractFeature image2 error");
         }

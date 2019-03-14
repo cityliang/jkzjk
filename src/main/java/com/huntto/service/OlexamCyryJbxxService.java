@@ -47,10 +47,21 @@ public interface OlexamCyryJbxxService {
 	Map selectCYRYVO(String idCard);
 	/**
 	 * 人脸识别对比查询二维码
+	 * 在线调用 /face/verify
 	 * @param NAME
 	 * @param PHOTO
 	 * @return
 	 */
 	Map verifyPicture(String NAME, String PHOTO);
+	
+	/**
+	 * 人脸识别对比查询二维码
+	 * 离线SDK调用   已弃用
+	 * @param NAME
+	 * @param PHOTO
+	 * @return
+	 */
+	@Deprecated
+	Map verifyPicture1(String NAME, String PHOTO);
 
 }

@@ -6,6 +6,9 @@ import com.huntto.entity.CyryQRIMG;
 import com.huntto.entity.CyryVo1;
 import com.huntto.entity.CyryVo3;
 import com.huntto.service.OlexamCyryJbxxService;
+import com.huntto.util.FaceRecognUtil;
+import com.huntto.util.Result;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     public OlexamCyryJbxxServiceImpl(OlexamCyryJbxxDao olexamCyryJbxxDao) {
         this.olexamCyryJbxxDao = olexamCyryJbxxDao;
     }
+    
+    @Autowired
+	private FaceRecognUtil faceRecognUtil;
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -60,9 +66,8 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     public Map selectCYRYVo1(String idCard) {
         Map map = new HashMap();
         List<CyryVo1> list = olexamCyryJbxxDao.selectCYRYVo1(idCard.trim());
-        CyryVo1 cyryVo1 = new CyryVo1();
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
-            cyryVo1 = list.get(0);
+        	CyryVo1 cyryVo1 = (CyryVo1)list.get(0);
             if (null != cyryVo1) {
                 if (StringUtils.isNoneBlank(cyryVo1.getBH())) {
                     map.put("BH", cyryVo1.getBH());
@@ -110,7 +115,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
                 } else {
                     map.put("FZJG", "");
                 }
-                if (null != cyryVo1.getID()) {
+                if (cyryVo1.getID() != null) {
                     List<CyryQRIMG> list1 = olexamCyryJbxxDao.selectQRCODE1(cyryVo1.getID());
                     if (null != list1 && !list1.isEmpty() && !"[]".equals(list1.toString())) {
                         CyryQRIMG QRIMG = list1.get(0);
@@ -225,10 +230,9 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     }
 
     public Map toMap(List<CyryVo1> list, Map map) {
-        CyryVo1 cyryVo1 = new CyryVo1();
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
-            cyryVo1 = list.get(0);
-            if (null != cyryVo1) {
+        	CyryVo1 cyryVo1 = list.get(0);
+            if (cyryVo1 != null) {
                 if (StringUtils.isNoneBlank(cyryVo1.getBH())) {
                     map.put("BH", cyryVo1.getBH());
                 } else {
@@ -264,22 +268,22 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
                 } else {
                     map.put("IDCARD", "");
                 }
-                if (null != cyryVo1.getPHOTO()) {
+                if (cyryVo1.getPHOTO() != null) {
                     String PHOTO = Base64.encodeBase64String(cyryVo1.getPHOTO());
                     map.put("PHOTO", PHOTO);
                 } else {
                     map.put("PHOTO", "");
                 }
-                if (null != cyryVo1.getFZJG()) {
+                if (cyryVo1.getFZJG() != null) {
                     map.put("FZJG", cyryVo1.getFZJG());
                 } else {
                     map.put("FZJG", "");
                 }
-                if (null != cyryVo1.getID()) {
+                if (cyryVo1.getID() != null) {
                     List<CyryQRIMG> list1 = olexamCyryJbxxDao.selectQRCODE1(cyryVo1.getID());
                     if (null != list1 && !list1.isEmpty() && !"[]".equals(list1.toString())) {
-                        CyryQRIMG QRIMG = list1.get(0);
-                        if (null != QRIMG) {
+                        CyryQRIMG QRIMG = (CyryQRIMG)list1.get(0);
+                        if (QRIMG != null) {
                             if (null != QRIMG.getQRIMG()) {
                                 map.put("QRIMG", Base64.encodeBase64String(QRIMG.getQRIMG()));
                             } else {
@@ -392,100 +396,214 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         map.put("list", list2);
         return map;
     }
+    
+    @Override
+    public Map verifyPicture(String NAME, String PHOTO){
+    	Map map = new HashMap();
+        String img1 = "";
+        String img2 = "";
+        String idcard = "";
+        List<CyryVo3> list = olexamCyryJbxxDao.getCYRYbyName(NAME.trim());
+        try {
+        	if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
+        		CyryVo3 cyryVo3;
+        		float similarity;
+        		if (list.size() == 1) {
+        			cyryVo3 = (CyryVo3) list.get(0);
+        			if (cyryVo3.getPHOTO() != null) {
+        				img1 = PHOTO;
+        				img2 = Base64.encodeBase64String(cyryVo3.getPHOTO());
+        				Result result =  faceRecognUtil.sendPost(img1, img2);
+        				log.info("result : "+result);
+        				if(result.getErrno() == 0) {
+        					if(result.getConfidence() == 0.0F) {
+        						map.put("msg", "请传入带有人脸的图片");
+            					return map;
+        					}else if(result.getConfidence() > 75.45F) {
+        						return getJKZXXbyIdcard(cyryVo3.getIDCARD());
+        					}else {
+        						map.put("msg", "未查询到相匹配的人员信息");
+            					return map;
+        					}
+    					}else {
+    						map.put("msg", "人脸识别接口请求失败！");
+        					return map;
+    					}
+        			} else {
+        				// 调用对比接口API获取相似度
+        				log.info("数据库人员头像图片为空，请确认该人员是否录入头像！");
+        				map.put("msg", "数据库人员头像图片为空，请确认该人员是否录入头像！");
+        				return map;
+        			}
+        		} else if (list.size() > 1) {
+        			Map map1 = new HashMap<>();
+        			for (int i=0;i<list.size();i++) {
+        				CyryVo3 cyryVo = (CyryVo3) list.get(i);
+        				int count;
+        				if(cyryVo.getPHOTO() != null) {
+        					img1 = PHOTO;
+        					img2 = Base64.encodeBase64String(cyryVo.getPHOTO());
+        					Result result =  faceRecognUtil.sendPost(img1, img2);
+        					log.info("result "+i+" : "+result);
+        					if(result.getErrno() == 0) {
+        						map1.put(result.getConfidence(), cyryVo.getIDCARD());
+        					}else {
+        						map.put("msg", "人脸识别接口请求失败！");
+            					return map;
+        					}
+        				} else {
+        					log.info("数据库人员头像图片为空，请确认该人员是否录入头像！");
+        					map.put("msg", "数据库人员头像图片为空，请确认该人员是否录入头像！");
+        					return map;
+        				}
+        			}
+        			if (null != map1 && !"{}".equals(map1.toString())) {
+        				// 调用对比接口API获取相似度
+        				idcard = String.valueOf(map1.get(getMaxKey(map1)));
+        				similarity = (float)getMaxKey(map1);
+        				if(similarity == 0.0F) {
+    						map.put("msg", "请传入带有人脸的图片");
+        					return map;
+    					}else if(similarity > 75.45F) {
+        					return getJKZXXbyIdcard(idcard);
+        				}else {
+        					map.put("msg", "未查询到相匹配的人员信息");
+        					return map;
+        				}
+        			}
+        		}
+        	}
+        }catch (Exception e) {
+        	log.info("服务端出现异常！");
+        	e.printStackTrace();
+        	map.put("msg", "服务端出现异常！");
+			return map;
+		}
+        return map;
+    }
 
     @Override
-    public Map verifyPicture(String NAME, String PHOTO) {
+    public Map verifyPicture1(String NAME, String PHOTO) {
 //    	log.info("传入的人脸头像编码： "+PHOTO);
     	Map map = new HashMap();
         byte[] photo = Base64.decodeBase64(PHOTO.getBytes());
         String photoFeature = getFeatureStr(photo);
         if(photoFeature == null) {
         	log.error("没有获取到传入的人脸头像特征");
+        	map.put("msg", "没有获取到传入的人脸头像特征");
         	return map;
         }
         String photoFeature1 = "";
+        String photoFeature2 = "";
         String idcard = "";
         List<CyryVo3> list = olexamCyryJbxxDao.getCYRYbyName(NAME.trim());
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
+        	CyryVo3 cyryVo3;
+			float similarity;
             if (list.size() == 1) {
-                CyryVo3 cyryVo3 = (CyryVo3) list.get(0);
+                cyryVo3 = (CyryVo3) list.get(0);
                 if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
                     photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
                     if(photoFeature1 == null) {
                     	log.error("没有获取到数据库的人脸头像特征");
+                    	map.put("msg", "没有获取到传入的人脸头像特征");
                     	return map;
-                    }else {
-                    	int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
-                    	log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                    	if (count != 1) {
-                    		log.error("更新cyryquery 表的 FEATURE数据失败");
-                    	} else {
-                    		// 调用对比接口API获取相似度
-//                        photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                    		if(cyryVo3.getFEATURE() == null) {
-                    			log.error("没有获取到数据库的人脸头像特征");
-                    			float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-                    			if(similarity > 70) {
-                    				idcard = cyryVo3.getIDCARD();
-                    				return getJKZXXbyIdcard(idcard);
-                    			}else {
-                    				return map;
-                    			}
-                    		}
-                    	}
                     }
-                } else {
+                    photoFeature2 = cyryVo3.getFEATURE();
+                	if(photoFeature1 != photoFeature2) {
+                		int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
+                		log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+                		if (count != 1) {
+                			log.error("更新cyryquery 表的 FEATURE数据失败");
+                		} else if(cyryVo3.getFEATURE() == null){
+                			// 调用对比接口API获取相似度
+//                          photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
+            				log.error("没有获取到数据库的人脸头像特征");
+            				similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
+            				if(similarity > 70.0F) {
+            					idcard = cyryVo3.getIDCARD();
+            					return getJKZXXbyIdcard(idcard);
+            				}else {
+            					map.put("msg", "未查询到相匹配的人员信息");
+            					return map;
+            				}
+                		}
+                	}
+                    
+                } else if(cyryVo3.getFEATURE() == null) {
                 	// 调用对比接口API获取相似度
 //                  photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-					if(cyryVo3.getFEATURE() == null) {
-					  	log.error("没有获取到数据库的人脸头像特征");
-					  	float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-					  	if(similarity > 70) {
-					  		idcard = cyryVo3.getIDCARD();
-					  		return getJKZXXbyIdcard(idcard);
-					  	}else {
-					  		return map;
-					  	}
-					}
+				  	log.error("没有获取到数据库的人脸头像特征");
+				  	similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
+				  	if(similarity > 70.0F) {
+				  		idcard = cyryVo3.getIDCARD();
+				  		return getJKZXXbyIdcard(idcard);
+				  	}else {
+				  		map.put("msg", "未查询到相匹配的人员信息");
+				  		return map;
+				  	}
                 }
             } else if (list.size() > 1) {
                 // 更新人脸特征码为空的数据
-                for (CyryVo3 cyryVo3 : list) {
-                    if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
-                        photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                        if(photoFeature1 == null) {
-                        	log.error("没有获取到数据库的人脸头像特征");
-                        	return map;
-                        }else {
-                        	int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
-                        	log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                        	if (count != 1) {
-                        		log.error("更新cyryquery 表的 FEATURE数据失败");
-                        	}
-                        }
-                    }
+                for (int i=0;i<list.size();i++) {
+                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
+                	int count;
+                    if (cyryVo.getFEATURE() == null) {
+                    	if(cyryVo.getPHOTO() == null ) {
+                    		log.info("数据库人员头像图片为空");
+                			map.put("msg", "数据库人员头像图片为空");
+                			return map;
+                    	}
+                    	if (cyryVo.getIDCARD() == null) {
+							this.log.info("数据库人员身份证号为空");
+							map.put("msg", "数据库人员身份证号为空");
+							return map;
+						}
+                    	photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
+						if (photoFeature1 == null) {
+							this.log.error("没有获取到数据库的人脸头像特征");
+							return map;
+						}
+						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
+							count = this.updateFeature(photoFeature1, cyryVo.getIDCARD());
+							log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+							if (count != 1) {
+								log.error("更新cyryquery 表的 FEATURE数据失败");
+							}
+						}
+                    }else if(cyryVo.getPHOTO() != null ) {
+                		photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
+						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
+                			count = updateFeature(photoFeature1, cyryVo.getIDCARD());
+                			log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+                			if (count != 1) {
+                				log.error("更新cyryquery 表的 FEATURE数据失败");
+                			}
+                		}
+                	}
+                    
                 }
 
                 Map map1 = new HashMap<>();
-                for (CyryVo3 cyryVo3 : list) {
-                    if (cyryVo3.getFEATURE() != null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
+                for (int i=0;i<list.size();i++) {
+                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
+                    if (cyryVo.getFEATURE() != null && cyryVo.getPHOTO() != null && cyryVo.getIDCARD() != null) {
                         // 调用对比接口API获取相似度
-                        float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-                        map1.put(similarity, cyryVo3.getIDCARD());
-                    } else {
-                        if (photoFeature != null && cyryVo3.getFEATURE() != null) {
-                            float similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-                            map1.put(similarity, cyryVo3.getIDCARD());
-                        }
+                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
+                        map1.put(similarity, cyryVo.getIDCARD());
+                    } else if (photoFeature != null && cyryVo.getFEATURE() != null) {
+                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
+                        map1.put(similarity, cyryVo.getIDCARD());
                     }
                 }
                 if (null != map1 && !"{}".equals(map1.toString())) {
                     // 调用对比接口API获取相似度
                     idcard = String.valueOf(map1.get(getMaxKey(map1)));
-                    float similarity = (float)getMaxKey(map1);
-                    if(similarity > 70) {
+                    similarity = (float)getMaxKey(map1);
+                    if(similarity > 70.0F) {
 				  		return getJKZXXbyIdcard(idcard);
 				  	}else {
+				  		map.put("msg", "未查询到相匹配的人员信息");
 				  		return map;
 				  	}
                 }
@@ -518,9 +636,8 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     Map getJKZXXbyIdcard(String idCard) {
         Map map = new HashMap();
         List<CyryVo1> list = olexamCyryJbxxDao.selectCYRYVo1(idCard.trim());
-        CyryVo1 cyryVo1 = new CyryVo1();
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
-            cyryVo1 = list.get(0);
+        	CyryVo1 cyryVo1 = list.get(0);
             if (null != cyryVo1) {
                 if (StringUtils.isNoneBlank(cyryVo1.getBH())) {
                     map.put("BH", cyryVo1.getBH());
@@ -620,11 +737,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         image.data = photo;
         image.format = ImageFormat.ImageFormat_UNKNOWN;
         Face faces[] = faceDetect.detectPicture(image);
-        if(faces != null) {
-        	return faceRegister.extractFeature(image, faces[0], ModelType.MODEL_SMALL);
-        }else {
-        	return null;
-        }
+        return faces != null ? faceRegister.extractFeature(image, faces[0], 1) : null;
     }
 
     /**

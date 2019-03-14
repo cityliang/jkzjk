@@ -15,8 +15,8 @@ public class FaceRecognUtil3 {
 		//创建DefaultAcsClient实例并初始化
 		DefaultProfile profile = DefaultProfile.getProfile(
 		        "cn-hangzhou",             //默认
-		        "LTAI0s1lk9uXDA4Q",         //您的Access Key ID
-		        "9ZyV13oloWVbetMDtRD3Q5ePviOxth");    //您的Access Key Secret
+		        "LTAIpfMXLqPGY81V",         //您的Access Key ID
+		        "Fxrwy8YeBjviLI4zivYWWsjF7oqVLR");    //您的Access Key Secret
 		IAcsClient client = new DefaultAcsClient(profile);
 		//创建API请求并设置参数
 		//CompareFaces接口文档：https://help.aliyun.com/document_detail/59317.html
