@@ -11,7 +11,9 @@ public class FaceRecognConfig {
 	@Value("${ak_id}")
 	private String ak_id; //用户ak
 	@Value("${ak_secret}")
-	private String ak_secret; // 用户ak_secret
-	@Value("${url}")
-	private String url; // 用户ak_secret
+	private String ak_secret;// 用户ak_secret
+	@Value("${verifyUrl}")
+	private String verifyUrl;// 人脸对比API接口调用地址
+	@Value("${detectUrl}")
+	private String detectUrl;// 人脸检测API接口调用地址
 }
