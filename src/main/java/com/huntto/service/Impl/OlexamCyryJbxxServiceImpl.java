@@ -28,15 +28,15 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     /**
      * 人脸检测
      */
-    private FaceDetect faceDetect = FaceDetect.createInstance(Mode.TERMINAL);
+//    private FaceDetect faceDetect = FaceDetect.createInstance(Mode.TERMINAL);
     /**
      * 人脸注册
      */
-    private FaceRegister faceRegister = FaceRegister.createInstance();
+//    private FaceRegister faceRegister = FaceRegister.createInstance();
     /**
      * 人脸识别
      */
-    private FaceRecognize faceRecognize = FaceRecognize.createInstance(Mode.TERMINAL);
+//    private FaceRecognize faceRecognize = FaceRecognize.createInstance(Mode.TERMINAL);
 
 
     @Autowired
@@ -423,7 +423,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
 		        				FaceVerifyResult fVerifyResult =  faceRecognUtil.faceVerify(img1, img2);
 		        				log.info("result : "+fVerifyResult);
 		        				if(fVerifyResult.getErrno() == 0) {
-		        					if(fVerifyResult.getConfidence() > 75.45F) {
+		        					if(fVerifyResult.getConfidence() > 67.05F) {//confidence > 60.03时误识率< 1/1000, confidence > 67.05时误识率< 1/10000, confidence > 75.45时误识率< 1/100000, 
 		        						return getJKZXXbyIdcard(cyryVo3.getIDCARD());
 		        					}else {
 		        						map.put("msg", "未查询到相匹配的人员信息");
@@ -445,7 +445,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
 //        					if(fVerifyResult.getConfidence() == 0.0F) {
 //        						map.put("msg", "请传入带有人脸的图片");
 //            					return map;
-//        					}else if(fVerifyResult.getConfidence() > 75.45F) {
+//        					}else if(fVerifyResult.getConfidence() > 67.05F) {//confidence > 60.03时误识率< 1/1000, confidence > 67.05时误识率< 1/10000, confidence > 75.45时误识率< 1/100000, 
 //        						return getJKZXXbyIdcard(cyryVo3.getIDCARD());
 //        					}else {
 //        						map.put("msg", "未查询到相匹配的人员信息");
@@ -508,7 +508,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         				// 调用对比接口API获取相似度
         				idcard = String.valueOf(map1.get(getMaxKey(map1)));
         				similarity = (float)getMaxKey(map1);
-        				if(similarity > 75.45F) {
+        				if(similarity > 67.05F) {//confidence > 60.03时误识率< 1/1000, confidence > 67.05时误识率< 1/10000, confidence > 75.45时误识率< 1/100000, 
         					return getJKZXXbyIdcard(idcard);
         				}else {
         					map.put("msg", "未查询到相匹配的人员信息");
@@ -526,136 +526,136 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         return map;
     }
 
-    @Override
-    public Map verifyPicture1(String NAME, String PHOTO) {
-//    	log.info("传入的人脸头像编码： "+PHOTO);
-    	Map map = new HashMap();
-        byte[] photo = Base64.decodeBase64(PHOTO.getBytes());
-        String photoFeature = getFeatureStr(photo);
-        if(photoFeature == null) {
-        	log.error("没有获取到传入的人脸头像特征");
-        	map.put("msg", "没有获取到传入的人脸头像特征");
-        	return map;
-        }
-        String photoFeature1 = "";
-        String photoFeature2 = "";
-        String idcard = "";
-        List<CyryVo3> list = olexamCyryJbxxDao.getCYRYbyName(NAME.trim());
-        if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
-        	CyryVo3 cyryVo3;
-			float similarity;
-            if (list.size() == 1) {
-                cyryVo3 = (CyryVo3) list.get(0);
-                if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
-                    photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-                    if(photoFeature1 == null) {
-                    	log.error("没有获取到数据库的人脸头像特征");
-                    	map.put("msg", "没有获取到传入的人脸头像特征");
-                    	return map;
-                    }
-                    photoFeature2 = cyryVo3.getFEATURE();
-                	if(photoFeature1 != photoFeature2) {
-                		int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
-                		log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                		if (count != 1) {
-                			log.error("更新cyryquery 表的 FEATURE数据失败");
-                		} else if(cyryVo3.getFEATURE() == null){
-                			// 调用对比接口API获取相似度
-//                          photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-            				log.error("没有获取到数据库的人脸头像特征");
-            				similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-            				if(similarity > 70.0F) {
-            					idcard = cyryVo3.getIDCARD();
-            					return getJKZXXbyIdcard(idcard);
-            				}else {
-            					map.put("msg", "未查询到相匹配的人员信息");
-            					return map;
-            				}
-                		}
-                	}
-                    
-                } else if(cyryVo3.getFEATURE() == null) {
-                	// 调用对比接口API获取相似度
-//                  photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
-				  	log.error("没有获取到数据库的人脸头像特征");
-				  	similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
-				  	if(similarity > 70.0F) {
-				  		idcard = cyryVo3.getIDCARD();
-				  		return getJKZXXbyIdcard(idcard);
-				  	}else {
-				  		map.put("msg", "未查询到相匹配的人员信息");
-				  		return map;
-				  	}
-                }
-            } else if (list.size() > 1) {
-                // 更新人脸特征码为空的数据
-                for (int i=0;i<list.size();i++) {
-                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
-                	int count;
-                    if (cyryVo.getFEATURE() == null) {
-                    	if(cyryVo.getPHOTO() == null ) {
-                    		log.info("数据库人员头像图片为空");
-                			map.put("msg", "数据库人员头像图片为空");
-                			return map;
-                    	}
-                    	if (cyryVo.getIDCARD() == null) {
-							this.log.info("数据库人员身份证号为空");
-							map.put("msg", "数据库人员身份证号为空");
-							return map;
-						}
-                    	photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
-						if (photoFeature1 == null) {
-							this.log.error("没有获取到数据库的人脸头像特征");
-							return map;
-						}
-						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
-							count = this.updateFeature(photoFeature1, cyryVo.getIDCARD());
-							log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-							if (count != 1) {
-								log.error("更新cyryquery 表的 FEATURE数据失败");
-							}
-						}
-                    }else if(cyryVo.getPHOTO() != null ) {
-                		photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
-						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
-                			count = updateFeature(photoFeature1, cyryVo.getIDCARD());
-                			log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
-                			if (count != 1) {
-                				log.error("更新cyryquery 表的 FEATURE数据失败");
-                			}
-                		}
-                	}
-                    
-                }
-
-                Map map1 = new HashMap<>();
-                for (int i=0;i<list.size();i++) {
-                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
-                    if (cyryVo.getFEATURE() != null && cyryVo.getPHOTO() != null && cyryVo.getIDCARD() != null) {
-                        // 调用对比接口API获取相似度
-                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
-                        map1.put(similarity, cyryVo.getIDCARD());
-                    } else if (photoFeature != null && cyryVo.getFEATURE() != null) {
-                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
-                        map1.put(similarity, cyryVo.getIDCARD());
-                    }
-                }
-                if (null != map1 && !"{}".equals(map1.toString())) {
-                    // 调用对比接口API获取相似度
-                    idcard = String.valueOf(map1.get(getMaxKey(map1)));
-                    similarity = (float)getMaxKey(map1);
-                    if(similarity > 70.0F) {
-				  		return getJKZXXbyIdcard(idcard);
-				  	}else {
-				  		map.put("msg", "未查询到相匹配的人员信息");
-				  		return map;
-				  	}
-                }
-            }
-        }
-
-        return map;
-    }
+//    @Override
+//    public Map verifyPicture1(String NAME, String PHOTO) {
+////    	log.info("传入的人脸头像编码： "+PHOTO);
+//    	Map map = new HashMap();
+//        byte[] photo = Base64.decodeBase64(PHOTO.getBytes());
+//        String photoFeature = getFeatureStr(photo);
+//        if(photoFeature == null) {
+//        	log.error("没有获取到传入的人脸头像特征");
+//        	map.put("msg", "没有获取到传入的人脸头像特征");
+//        	return map;
+//        }
+//        String photoFeature1 = "";
+//        String photoFeature2 = "";
+//        String idcard = "";
+//        List<CyryVo3> list = olexamCyryJbxxDao.getCYRYbyName(NAME.trim());
+//        if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
+//        	CyryVo3 cyryVo3;
+//			float similarity;
+//            if (list.size() == 1) {
+//                cyryVo3 = (CyryVo3) list.get(0);
+//                if (cyryVo3.getFEATURE() == null && cyryVo3.getPHOTO() != null && cyryVo3.getIDCARD() != null) {
+//                    photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
+//                    if(photoFeature1 == null) {
+//                    	log.error("没有获取到数据库的人脸头像特征");
+//                    	map.put("msg", "没有获取到传入的人脸头像特征");
+//                    	return map;
+//                    }
+//                    photoFeature2 = cyryVo3.getFEATURE();
+//                	if(photoFeature1 != photoFeature2) {
+//                		int count = updateFeature(photoFeature1, cyryVo3.getIDCARD());
+//                		log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+//                		if (count != 1) {
+//                			log.error("更新cyryquery 表的 FEATURE数据失败");
+//                		} else if(cyryVo3.getFEATURE() == null){
+//                			// 调用对比接口API获取相似度
+////                          photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
+//            				log.error("没有获取到数据库的人脸头像特征");
+//            				similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
+//            				if(similarity > 70.0F) {
+//            					idcard = cyryVo3.getIDCARD();
+//            					return getJKZXXbyIdcard(idcard);
+//            				}else {
+//            					map.put("msg", "未查询到相匹配的人员信息");
+//            					return map;
+//            				}
+//                		}
+//                	}
+//                    
+//                } else if(cyryVo3.getFEATURE() == null) {
+//                	// 调用对比接口API获取相似度
+////                  photoFeature1 = getFeatureStr(cyryVo3.getPHOTO());
+//				  	log.error("没有获取到数据库的人脸头像特征");
+//				  	similarity = Tools.compareFeatures(photoFeature, cyryVo3.getFEATURE());
+//				  	if(similarity > 70.0F) {
+//				  		idcard = cyryVo3.getIDCARD();
+//				  		return getJKZXXbyIdcard(idcard);
+//				  	}else {
+//				  		map.put("msg", "未查询到相匹配的人员信息");
+//				  		return map;
+//				  	}
+//                }
+//            } else if (list.size() > 1) {
+//                // 更新人脸特征码为空的数据
+//                for (int i=0;i<list.size();i++) {
+//                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
+//                	int count;
+//                    if (cyryVo.getFEATURE() == null) {
+//                    	if(cyryVo.getPHOTO() == null ) {
+//                    		log.info("数据库人员头像图片为空");
+//                			map.put("msg", "数据库人员头像图片为空");
+//                			return map;
+//                    	}
+//                    	if (cyryVo.getIDCARD() == null) {
+//							this.log.info("数据库人员身份证号为空");
+//							map.put("msg", "数据库人员身份证号为空");
+//							return map;
+//						}
+//                    	photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
+//						if (photoFeature1 == null) {
+//							this.log.error("没有获取到数据库的人脸头像特征");
+//							return map;
+//						}
+//						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
+//							count = this.updateFeature(photoFeature1, cyryVo.getIDCARD());
+//							log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+//							if (count != 1) {
+//								log.error("更新cyryquery 表的 FEATURE数据失败");
+//							}
+//						}
+//                    }else if(cyryVo.getPHOTO() != null ) {
+//                		photoFeature1 = getFeatureStr(cyryVo.getPHOTO());
+//						if (!photoFeature1.equals(cyryVo.getFEATURE())) {
+//                			count = updateFeature(photoFeature1, cyryVo.getIDCARD());
+//                			log.info("更新了cyryquery 表的 FEATURE" + count + "条数据");
+//                			if (count != 1) {
+//                				log.error("更新cyryquery 表的 FEATURE数据失败");
+//                			}
+//                		}
+//                	}
+//                    
+//                }
+//
+//                Map map1 = new HashMap<>();
+//                for (int i=0;i<list.size();i++) {
+//                	CyryVo3 cyryVo = (CyryVo3) list.get(i);
+//                    if (cyryVo.getFEATURE() != null && cyryVo.getPHOTO() != null && cyryVo.getIDCARD() != null) {
+//                        // 调用对比接口API获取相似度
+//                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
+//                        map1.put(similarity, cyryVo.getIDCARD());
+//                    } else if (photoFeature != null && cyryVo.getFEATURE() != null) {
+//                        similarity = Tools.compareFeatures(photoFeature, cyryVo.getFEATURE());
+//                        map1.put(similarity, cyryVo.getIDCARD());
+//                    }
+//                }
+//                if (null != map1 && !"{}".equals(map1.toString())) {
+//                    // 调用对比接口API获取相似度
+//                    idcard = String.valueOf(map1.get(getMaxKey(map1)));
+//                    similarity = (float)getMaxKey(map1);
+//                    if(similarity > 70.0F) {
+//				  		return getJKZXXbyIdcard(idcard);
+//				  	}else {
+//				  		map.put("msg", "未查询到相匹配的人员信息");
+//				  		return map;
+//				  	}
+//                }
+//            }
+//        }
+//
+//        return map;
+//    }
 
     /**
      * 求Map<K,V>中Key(键)的最大值
@@ -774,15 +774,15 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
      * @param photo
      * @return
      */
-    private String getFeatureStr(byte[] photo) {
-        // 下面注释的是用来测试用的代码
-//		byte[] imageData = Utils.loadFile("./pictures/liudehua_feature1.jpg");
-        Image image = new Image();
-        image.data = photo;
-        image.format = ImageFormat.ImageFormat_UNKNOWN;
-        Face faces[] = faceDetect.detectPicture(image);
-        return faces != null ? faceRegister.extractFeature(image, faces[0], 1) : null;
-    }
+//    private String getFeatureStr(byte[] photo) {
+//        // 下面注释的是用来测试用的代码
+////		byte[] imageData = Utils.loadFile("./pictures/liudehua_feature1.jpg");
+//        Image image = new Image();
+//        image.data = photo;
+//        image.format = ImageFormat.ImageFormat_UNKNOWN;
+//        Face faces[] = faceDetect.detectPicture(image);
+//        return faces != null ? faceRegister.extractFeature(image, faces[0], 1) : null;
+//    }
 
     /**
      * 通过身份证号更新人脸特征码

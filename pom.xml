@@ -23,7 +23,7 @@
 	<dependencies>
 		
 		<!-- 阿里云接口依赖 -->
-		<dependency>
+		<!-- <dependency>
 		    <groupId>com.aliyun</groupId>
 		    <artifactId>aliyun-java-sdk-core</artifactId>
 		    <version>4.1.2</version>
@@ -32,7 +32,7 @@
 		    <groupId>com.aliyun</groupId>
 		    <artifactId>aliyun-java-sdk-cloudauth</artifactId>
 		    <version>1.2.0</version>
-		</dependency>
+		</dependency> -->
 		<!-- 移除之后会报错，加入下面的依赖 -->
 		<!--<dependency> <groupId>javax.servlet</groupId> <artifactId>javax.servlet-api</artifactId> 
 			<scope>provided</scope> </dependency> -->

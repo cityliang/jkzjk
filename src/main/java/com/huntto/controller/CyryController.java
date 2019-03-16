@@ -408,7 +408,8 @@ public class CyryController {
 	public String faceRecognition1(String NAME,String PHOTO) throws JsonProcessingException {
 		String json = "";
 		if (Nulls.validateValue(NAME,PHOTO)) {
-			Map map = olexamCyryJbxxService.verifyPicture1(NAME,PHOTO);
+			Map map = new HashMap<>();
+//			map = olexamCyryJbxxService.verifyPicture1(NAME,PHOTO);
 			if (null != map && !"{}".equals(map.toString())) {
 				if(map.containsKey("msg")) {
 					String mString = String.valueOf(map.get("msg"));

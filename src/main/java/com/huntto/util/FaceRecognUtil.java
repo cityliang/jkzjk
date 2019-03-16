@@ -1,10 +1,7 @@
 package com.huntto.util;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -20,10 +17,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.huntto.config.FaceRecognConfig;
 
 import lombok.Data;
@@ -56,7 +51,7 @@ public class FaceRecognUtil {
 	 * 人脸检测API接口调用
 	 * 发送POST请求
 	 * @param img1 传入的图片Base64编码
-	 * @return
+	 * @return FaceDetectResult
 	 * @throws Exception Exception
 	 */
 	public FaceDetectResult faceDetect(String img1) throws Exception {
@@ -129,10 +124,6 @@ public class FaceRecognUtil {
        return JsonUtil.readValue(result, FaceDetectResult.class);
    }
 	
-	 /*
-	  * 人脸对比API接口调用
-	  * 发送POST请求
-     */
 	/**
 	 * 人脸对比API接口调用
 	 * 发送POST请求
@@ -211,9 +202,11 @@ public class FaceRecognUtil {
         return JsonUtil.readValue(result, FaceVerifyResult.class);
     }
 	
-	/*
-     * 计算MD5+BASE64
-     */
+	/**
+	 * 计算MD5+BASE64
+	 * @param s 需要加密的字符串
+	 * @return 加密之后的字符串
+	 */
     String MD5Base64(String s) {
         if (s == null)
             return null;
@@ -225,8 +218,6 @@ public class FaceRecognUtil {
             mdTemp.update(utfBytes);
             byte[] md5Bytes = mdTemp.digest();
             encodeStr = Base64.encodeBase64String(md5Bytes);
-//            BASE64Encoder b64Encoder = new BASE64Encoder();
-//            encodeStr = b64Encoder.encode(md5Bytes);
         } catch (Exception e) {
             throw new Error("Failed to generate MD5 : " + e.getMessage());
         }
@@ -234,8 +225,11 @@ public class FaceRecognUtil {
 
     }
 
-    /*
+    /**
      * 计算 HMAC-SHA1
+     * @param data stringToSign
+     * @param key ak_secret
+     * @return HMAC-SHA1
      */
     String HMACSha1(String data, String key) {
         String result;
@@ -245,15 +239,16 @@ public class FaceRecognUtil {
             mac.init(signingKey);
             byte[] rawHmac = mac.doFinal(data.getBytes());
             result = Base64.encodeBase64String(rawHmac);
-//            result = (new BASE64Encoder()).encode(rawHmac);
         } catch (Exception e) {
             throw new Error("Failed to generate HMAC : " + e.getMessage());
         }
         return result;
     }
 
-    /*
+    /**
      * 等同于javaScript中的 new Date().toUTCString();
+     * @param date 时间
+     * @return 格式化之后的时间
      */
     String toGMTString(Date date) {
         SimpleDateFormat df = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.UK);

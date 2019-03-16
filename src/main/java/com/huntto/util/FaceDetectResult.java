@@ -7,7 +7,6 @@ public class FaceDetectResult {
 	private int errno;// 0为成功，非0为失败，详细说明参见错误码
 	private String err_msg;// 处理失败时的说明
 	private String request_id;// request_id 请求id信息
-	
 	private int face_num;// 检测出来的人脸个数
 	private int[] face_rect;// 返回人脸矩形框，分别是[left, top, width, height], 如有多个人脸，则依次顺延，返回矩形框。如有两个人脸则返回[left1, top1, width1, height1, left2, top2, width2, height2]
 	private float[] face_prob;// 返回人脸概率, 0-1之间，如有多个人脸，则依次顺延。如有两个人脸则返回[face_prob1, face_prob2]

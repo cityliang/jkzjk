@@ -61,7 +61,7 @@ public interface OlexamCyryJbxxService {
 	 * @param PHOTO
 	 * @return
 	 */
-	@Deprecated
-	Map verifyPicture1(String NAME, String PHOTO);
+//	@Deprecated
+//	Map verifyPicture1(String NAME, String PHOTO);
 
 }
