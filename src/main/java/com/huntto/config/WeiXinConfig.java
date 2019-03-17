@@ -1,5 +1,7 @@
 package com.huntto.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,5 +17,6 @@ public class WeiXinConfig {
 	@Value("${APPSECRET}")
 	private String APPSECRET;// 微信公众号的密钥
 	
-
+	@Value("#{'${IPLIST}'.split(',')}")
+	private List<String> iplist;
 }

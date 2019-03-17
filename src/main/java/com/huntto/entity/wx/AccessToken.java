@@ -1,4 +1,4 @@
-package com.huntto.entity;
+package com.huntto.entity.wx;
 
 import lombok.Data;
 

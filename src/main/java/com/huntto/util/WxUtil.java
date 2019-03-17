@@ -1,25 +1,37 @@
 package com.huntto.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.net.ssl.HttpsURLConnection;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huntto.config.WeiXinConfig;
+import com.huntto.entity.wx.AccessToken;
+import com.huntto.entity.wx.JsapiTicket;
+import com.huntto.entity.wx.WxIPList;
+
+import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @RestController
+@Configuration
 public class WxUtil {
 	
 	@Autowired
@@ -34,9 +46,66 @@ public class WxUtil {
 	@Test
 	@RequestMapping("/getAccessToken")
 	public String getAccessToken() throws Exception {
-		String urlStr = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+wConfig.getAPPID()+"&secret="+wConfig.getAPPSECRET();
-		String string = processUrl(urlStr);
-		return string;
+		List<String> list = wConfig.getIplist();
+		for(int i = 0; i < list.size(); i++) {
+    		String urlStr = "https://"+list.get(i)+"/cgi-bin/token?grant_type=client_credential&appid="+wConfig.getAPPID()+"&secret="+wConfig.getAPPSECRET(); 
+            log.info("当前访问的微信urlStr为: "+urlStr);
+            try {
+            	String str = processUrl(urlStr);
+        		AccessToken aToken =  JsonUtil.readValue(str, AccessToken.class);
+        		return aToken.getAccess_token();
+            }catch (ConnectException e) {
+            	log.info("当前访问的微信urlStr为: "+urlStr);
+            	e.printStackTrace();
+				continue;
+			} catch (IOException e) {
+				log.info("当前访问的微信urlStr为: "+urlStr);
+				e.printStackTrace();
+				continue;
+			}
+    	}
+		return null;
+	}
+	
+	@Test
+	@RequestMapping("/getcallbackip")
+	public String getcallbackip() throws Exception {
+//		urlStr += "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
+		WeiXinUtil.ACCESS_TOKEN = getAccessToken();
+		List<String> ipList = wConfig.getIplist();
+		String urlStr = "";
+		if(ipList != null && !ipList.isEmpty()) {
+			for(String str:ipList) {
+				urlStr += "https://"+str+"/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
+				log.info("当前访问的微信IP为: "+str);
+				log.info("当前访问的微信urlStr为: "+urlStr);
+				try {
+					String string = processUrl(urlStr);
+					log.info("string: "+string);
+					WxIPList wIpList = JsonUtil.readValue(string, WxIPList.class);
+					String [] strings = wIpList.getIp_list();
+					log.info("微信服务器IP数组为： "+strings);
+//					List list = Arrays.asList(strings);
+//					if(!ListUtils.isEqualCollection(list,wConfig.getIplist())) {
+//						str = (String) list.get(random.nextInt(ipList.size()));
+//						urlStr += "https://"+str+"/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
+//						WxIPList wIpList1 = mapper.readValue(processUrl(urlStr), WxIPList.class);
+//						String [] strings1 = wIpList.getIp_list();
+//						List list1 = Arrays.asList(strings);
+//						wConfig.setIplist(list1);
+//					}
+				} catch (ConnectException e) {
+                	log.info("当前访问的微信urlStr为: "+urlStr);
+                	e.printStackTrace();
+					continue;
+				} catch (IOException e) {
+					log.info("当前访问的微信urlStr为: "+urlStr);
+					e.printStackTrace();
+					continue;
+				}
+			}
+		}
+		return "";
 	}
 
 	/**
@@ -48,10 +117,25 @@ public class WxUtil {
 	 */
 	@RequestMapping("/getJsapiTicket")
 	public String getJsapiTicket() throws Exception {
-		String access_token = WeiXinUtil.ACCESS_TOKEN;
-		String urlStr = "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=" + access_token;
-		String string = processUrl(urlStr);
-		return string;
+		List<String> list = wConfig.getIplist();
+		for(int i = 0; i < list.size(); i++) {
+    		String urlStr = "https://"+list.get(i)+"/cgi-bin/ticket/getticket?access_token="+WeiXinUtil.ACCESS_TOKEN+"&type=jsapi";
+            log.info("当前访问的微信urlStr为: "+urlStr);
+            try {
+            	String str = processUrl(urlStr);
+            	JsapiTicket jTicket =  JsonUtil.readValue(str, JsapiTicket.class);
+        		return jTicket.getTicket();
+            }catch (ConnectException e) {
+            	log.info("当前访问的微信urlStr为: "+urlStr);
+            	e.printStackTrace();
+				continue;
+			} catch (IOException e) {
+				log.info("当前访问的微信urlStr为: "+urlStr);
+				e.printStackTrace();
+				continue;
+			}
+    	}
+		return null;
 	}
 
 	/**
@@ -67,31 +151,28 @@ public class WxUtil {
 //		String tsapiTicket = request.getParameter("jsapi_ticket");
 //		String timestamp = request.getParameter("timestamp");
 //		String url = request.getParameter("url");
-		String jsSdkSign = getJsSdkSign1(noncestr, tsapiTicket, timestamp, url);
+		String jsSdkSign = getJsSdkSign1(WxUtil.getNoncestr(), tsapiTicket, WxUtil.getTimestamp(), "http://hzjkz.hzwsjsw.gov.cn");
 		return jsSdkSign;
 	}
 
-	private String processUrl(String urlStr) {
+	private String processUrl(String urlStr) throws ConnectException,IOException {
 		URL url;
 		String sCurrentLine = "";
 		String sTotalString = "";
-		try {
-			url = new URL(urlStr);
-			URLConnection URLconnection = url.openConnection();
-			HttpURLConnection httpConnection = (HttpURLConnection) URLconnection;
-			int responseCode = httpConnection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				InputStream urlStream = httpConnection.getInputStream();
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlStream));
-				while ((sCurrentLine = bufferedReader.readLine()) != null) {
-					sTotalString += sCurrentLine;
-				}
-				return sTotalString;
-			} else {
-				System.err.println("失败");
+		url = new URL(urlStr);
+		URLConnection URLconnection = url.openConnection();
+		HttpsURLConnection httpConnection = (HttpsURLConnection) URLconnection;
+		httpConnection.setHostnameVerifier(new WeiXinUtil().new TrustAnyHostnameVerifier());
+		int responseCode = httpConnection.getResponseCode();
+		if (responseCode == HttpURLConnection.HTTP_OK) {
+			InputStream urlStream = httpConnection.getInputStream();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlStream));
+			while ((sCurrentLine = bufferedReader.readLine()) != null) {
+				sTotalString += sCurrentLine;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			return sTotalString;
+		} else {
+			log.info("该服务器访问失败");
 		}
 		return sTotalString;
 	}
@@ -106,8 +187,7 @@ public class WxUtil {
 	 * @return
 	 */
 	public static String getJsSdkSign1(String noncestr, String tsapiTicket, String timestamp, String url) {
-		String content = "jsapi_ticket=" + tsapiTicket + "&noncestr=" + noncestr + "&timestamp=" + timestamp + "&url="
-				+ url;
+		String content = "jsapi_ticket=" + tsapiTicket + "&noncestr=" + noncestr + "&timestamp=" + timestamp + "&url=" + url;
 		String ciphertext = getSha1(content);
 		return ciphertext;
 	}
@@ -141,11 +221,21 @@ public class WxUtil {
 			return null;
 		}
 	}
+	
+	/** 
+	 * 获取精确到秒的时间戳 
+	 * @param date 
+	 * @return 
+	 */  
+	public static String getTimestamp(){  
+	    String timestamp = String.valueOf(new Date().getTime()/1000);  
+	    return timestamp;  
+	}
 
 	/**
 	 * 获得随机串
 	 */
-	public static String create_noncestr() {
+	public static String getNoncestr() {
 		return UUID.randomUUID().toString();
 	}
 }
