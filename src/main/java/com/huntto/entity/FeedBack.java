@@ -7,18 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @ApiModel
 @Builder
 public class FeedBack {
 
-    @Id
     private String ID;// ID
     @ApiModelProperty(hidden = true)
     private String FBType;// 反馈类型

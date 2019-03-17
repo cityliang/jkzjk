@@ -108,6 +108,14 @@ public class WxUtil {
 		return "";
 	}
 
+	@Test
+	@RequestMapping("/getcallbackip")
+	public String getcallbackip() throws Exception {
+		String urlStr = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
+		String string = processUrl(urlStr);
+		return string;
+	}
+
 	/**
 	 * 获取jsapi_ticket
 	 * 
