@@ -1,13 +1,5 @@
 package com.huntto.service.Impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.huntto.dao.CyryDao;
 import com.huntto.dao.FeedBackDao;
 import com.huntto.dao.OlexamCyryJbxxDao;
@@ -18,6 +10,13 @@ import com.huntto.util.ConvertUtil;
 import com.huntto.util.DateUtil;
 import com.huntto.util.Nulls;
 import com.huntto.util.UUIDTool;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FeedBackServiceImpl implements FeedBackService {
@@ -67,8 +66,8 @@ public class FeedBackServiceImpl implements FeedBackService {
 		}	
 		return count;
 	}
-	
-	public String toTJJGID(String IDCARD) {
+
+	private String toTJJGID(String IDCARD) {
 		String MEDI_INTID = "";
 		List<String> list1 = feedBackDao.selectTJJGID(IDCARD);
 		if(null != list1 && !list1.isEmpty() && !"[]".equals(list1.toString())) {

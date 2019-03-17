@@ -1,5 +1,9 @@
 package com.huntto.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -8,21 +12,10 @@ import java.sql.Clob;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.*;
 
 /**
- * Utility class to convert one object to another.
- *
- * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
+ * 转换工具类
  */
 public final class ConvertUtil {
     protected static final Log log = LogFactory.getLog(ConvertUtil.class);
@@ -51,13 +44,13 @@ public final class ConvertUtil {
 	 * String 2 Long,有默认值
 	 */
 	public static Long toLong(String str, long defaultVal){
-		Long i = new Long(defaultVal);
-		try {
+        Long i = defaultVal;
+        try {
 			if(Nulls.isNotEmpty(str)){
 				i = new Long(str);
 			}
-		} catch (Exception e) {
-		}
+        } catch (Exception ignored) {
+        }
 		return i;
 	}
 	
@@ -162,7 +155,6 @@ public final class ConvertUtil {
 	 * 字符串转日期，优先考虑DateConverter
 	 */
 	public static Date toParseDate(String time)  {
-		/** */
 		/**
 		 * 字符串转换为java.util.Date 支持格式为:
 		 * yyyy.MM.dd G 'at' hh:mm:ss z 如 '2002-1-1 AD at 22:10:59 PSD' 
@@ -189,37 +181,36 @@ public final class ConvertUtil {
 		}
 		
 		tempPos = time.indexOf("-");
-		
-		if (time.indexOf(".") != -1) {
-			time = time.substring(0, time.indexOf("."));
+
+            if (time.contains(".")) {
+                time = time.substring(0, time.indexOf("."));
 		}
 		
 		if (tempPos > -1) {//包含“-”
-			if(time.indexOf(":") == -1){
-				formatter = new SimpleDateFormat("yyyy-MM-dd");
+            if (!time.contains(":")) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd");
 			} else if (time.indexOf(":") == time.lastIndexOf(":")) {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			} else {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			}
-		} else if (time.indexOf("/") > -1) {//包含“/”
-			if(time.indexOf(":") == -1){
-				formatter = new SimpleDateFormat("yyyy/MM/dd");
+        } else if (time.contains("/")) {//包含“/”
+            if (!time.contains(":")) {
+                formatter = new SimpleDateFormat("yyyy/MM/dd");
 			}else{
 				formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			}
-		} else if (time.substring(0, 8).indexOf("-") == -1) {
-			time = time.substring(0, 8);
+        } else if (!time.substring(0, 8).contains("-")) {
+            time = time.substring(0, 8);
 			formatter = new SimpleDateFormat("yyyyMMdd");
 		} else {
 			formatter = new SimpleDateFormat("HH:mm");
 		}
 		
 		ParsePosition pos = new ParsePosition(0);
-		java.util.Date ctime = formatter.parse(time, pos);
-		return ctime;
-		
-		}
+            return formatter.parse(time, pos);
+
+        }
 		catch(Exception ex)
 		{ return null;}
 		
@@ -252,10 +243,10 @@ public final class ConvertUtil {
 	
 	/**
 	 * 获取当前提前最后一天
-	 * @param date
-	 * @return
-	 * @throws Exception
-	 */
+     * @param date date
+     * @return date
+     * @throws Exception  Exception
+     */
 	public static Date getLastDayByMonth(Date date) throws Exception{
 		Calendar cal = Calendar.getInstance();   
 		cal.setTime(date);   
@@ -301,8 +292,8 @@ public final class ConvertUtil {
 	 * 获取当前日期 N年后 的前一天
 	 * @param year	几年后
 	 * @param date	当前日期
-	 * @return
-	 */
+     * @return Date
+     */
 	public static Date getForwardOneDateAfterNYear(int year,Date date){
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");   
@@ -330,10 +321,9 @@ public final class ConvertUtil {
 	    int day=calendar.get(Calendar.DATE);   
 	    calendar.set(Calendar.DATE,day - 10);
 	    Date dat = calendar.getTime();
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");   
-	    String  date1  = sdf.format(dat) ; 
-	    Date d = sdf.parse(date1);
-	    return d;
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+          String date1 = sdf.format(dat);
+          return sdf.parse(date1);
     } catch (Exception e) {
       return null;
     }
@@ -349,11 +339,10 @@ public final class ConvertUtil {
 			int day=calendar.get(Calendar.DATE);   
 			calendar.set(Calendar.DATE,day - days);
 			Date dat = calendar.getTime();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");   
-			String  date1  = sdf.format(dat) ; 
-			Date d = sdf.parse(date1);
-			return d;
-		} catch (Exception e) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String date1 = sdf.format(dat);
+            return sdf.parse(date1);
+        } catch (Exception e) {
 			return null;
 		}
 		
@@ -368,10 +357,9 @@ public final class ConvertUtil {
 	    int day=calendar.get(Calendar.DATE);   
 	    calendar.set(Calendar.DATE,day + 6);
 	    Date dat = calendar.getTime();
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");   
-	    String  date1  = sdf.format(dat) ; 
-	    Date d = sdf.parse(date1);
-	    return d;
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+          String date1 = sdf.format(dat);
+          return sdf.parse(date1);
     } catch (Exception e) {
       return null;
     }
@@ -399,17 +387,17 @@ public final class ConvertUtil {
 			String shi = qhdm.substring(2,4);//市
 			String xq = qhdm.substring(4,6);//县区
 			String jd = qhdm.substring(6,9);//乡镇街道
-			if(sheng.indexOf("00") == -1){
-				sb.append(sheng);
+            if (!sheng.contains("00")) {
+                sb.append(sheng);
 			}
-			if(shi.indexOf("00") == -1){
-				sb.append(shi);
+            if (!shi.contains("00")) {
+                sb.append(shi);
 			}
-			if(xq.indexOf("00") == -1){
-				sb.append(xq);
+            if (!xq.contains("00")) {
+                sb.append(xq);
 			}
-			if(jd.indexOf("000") == -1){
-				sb.append(jd);
+            if (!jd.contains("000")) {
+                sb.append(jd);
 			}
 			return sb.toString();
 		}else{
@@ -455,8 +443,8 @@ public final class ConvertUtil {
 	 * 生成sql select语句中的regioncode
 	 * @param regionCode 行政区划代码，9位
 	 * @param regionCol 表中的根据行政区划查询的列名
-	 * @return
-	 */
+     * @return String
+     */
 	public static String generateSelectRegionCode(String regionCode,String regionCol){
 		String str = handleXZQH(regionCode);
 		switch (str.length()) {
@@ -474,8 +462,8 @@ public final class ConvertUtil {
 	/**
 	 * 生成sql where like语句中的regioncode
 	 * @param regionCode 行政区划代码，9位
-	 * @return
-	 */
+     * @return String
+     */
 	public static String generateWhereLikeRegionCode(String regionCode){
 		String str = handleXZQH(regionCode);
 		switch (str.length()) {
@@ -493,8 +481,8 @@ public final class ConvertUtil {
 	/**
 	 * 生成sql where <>语句中的regioncode
 	 * @param regionCode 行政区划代码，9位
-	 * @return
-	 */
+     * @return String
+     */
 	public static String generateWhereNQRegionCode(String regionCode){
 		String str = handleXZQH(regionCode);
 		switch (str.length()) {
@@ -512,8 +500,8 @@ public final class ConvertUtil {
 	/**
 	 * 生成sql group by语句中的regioncode
 	 * @param regionCode 行政区划代码，9位
-	 * @return
-	 */
+     * @return String
+     */
 	public static String generateGroupByRegionCode(String regionCode,String regionCol){
 		String str = handleXZQH(regionCode);
 		switch (str.length()) {
@@ -534,8 +522,8 @@ public final class ConvertUtil {
 	 * @param qhdm 地区编码 （精确至区县，六位）
 	 */
 	public static String generateCOMP_NO(int qhdm){
-		StringBuffer sb = new StringBuffer();
-		sb.append(String.valueOf(qhdm).substring(0, 6));
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(qhdm).substring(0, 6));
 		String dateStr = dataFormat(new Date(),"yyMMdd");
 		sb.append(dateStr);
 		String timeStr = dataFormat(new Date(),"HHmmss");
@@ -552,8 +540,8 @@ public final class ConvertUtil {
 	 * @param qhdm 地区编码 （精确至区县，六位）
 	 */
 	public static String generateDIS_ID(int qhdm){
-		StringBuffer sb = new StringBuffer();
-		sb.append(String.valueOf(qhdm).substring(0, 6));
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(qhdm).substring(0, 6));
 		String dateStr = dataFormat(new Date(),"yyMMdd");
 		sb.append(dateStr);
 		String timeStr = dataFormat(new Date(),"HHmmss");
@@ -645,8 +633,8 @@ public final class ConvertUtil {
 	
 	/**
 	 * 生成附件上传的唯一标示，每个pojo类统一字段FJUPLOADID
-	 * @return
-	 */
+     * @return String
+     */
 	public static String generateFJUploadID(){
 		return ConvertUtil.generateID();
 	}
@@ -656,8 +644,8 @@ public final class ConvertUtil {
 	 */
 	public static String prepBGKXML(String bizType,String speCode,
 			String operate,String regionCode,String sendTime,String sendCode){
-		StringBuffer sb = new StringBuffer();
-		sb.append("<DSCR>\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("<DSCR>\n");
 		sb.append("<BIZTYPE>"+bizType+"</BIZTYPE>\n");
 		sb.append("<SPECODE>"+speCode+"</SPECODE>\n");
 		sb.append("<OPERATE>"+operate+"</OPERATE>\n");
@@ -690,18 +678,18 @@ public final class ConvertUtil {
 	
 	/**
 	 * 许可证里取流水号
-	 * @param hEALTH_LICENSE
-	 * @return
-	 */
+     * @param hEALTH_LICENSE hEALTH_LICENSE
+     * @return 许可证里取流水号
+     */
 	public static String getLicenseNum(String hEALTH_LICENSE) {
 		return getLicenseNum(hEALTH_LICENSE, "第", "号");
 	}
 	
 	/**
 	 * 许可证里取流水号
-	 * @param hEALTH_LICENSE
-	 * @return
-	 */
+     * @param hEALTH_LICENSE hEALTH_LICENSE
+     * @return hEALTH_LICENSE
+     */
 	private static String getLicenseNum(String hEALTH_LICENSE, String begin,String end) {
 		if(hEALTH_LICENSE == null) return "";
 		
@@ -1266,9 +1254,9 @@ public final class ConvertUtil {
 	
 	/**
 	 * 返回两个相同类的不同对象属性值不同的属性
-	 * @param object 待比较的对象1
-	 * @param object 待比较的对象2
-	 * @return String   AA/BB/CC
+     * @param clzzOld 待比较的对象1
+     * @param clzzNew 待比较的对象2
+     * @return String   AA/BB/CC
 	 * @author cao.yazhen
 	 */
 	public static String compareObj(Object clzzOld,Object clzzNew){
@@ -1348,9 +1336,8 @@ public final class ConvertUtil {
 	}
 	
 	public static String toNvl(Object src){
-		String srcValue = ((src == null||src=="") ? "0" : src.toString());
-		return srcValue;	
-	}
+        return ((src == null || src == "") ? "0" : src.toString());
+    }
 	
 	public static String toBgkCompType(Object local_bizType){
 		String strValue = ((local_bizType == null||"".equals(local_bizType))?"—":local_bizType.toString());
@@ -1404,8 +1391,8 @@ public final class ConvertUtil {
 	 * 转换性别
 	 * 
 	 * @param xb xb
-	 * @return
-	 */
+     * @return 性别
+     */
 	public static String toXB(String xb) {
 		if (StringUtils.isNotBlank(xb)) {
 			if ("1".equals(xb)) {
@@ -1423,8 +1410,8 @@ public final class ConvertUtil {
 	 * 转换体检结果
 	 * 
 	 * @param LB LB
-	 * @return
-	 */
+     * @return 体检结果
+     */
 	public static String toLB(String LB) {
 		if (StringUtils.isNotBlank(LB)) {
 			if ("1".equals(LB)) {
@@ -1448,8 +1435,8 @@ public final class ConvertUtil {
 				TJJG = "合格";
 			} else if ("0".equals(TJJG)) {
 				TJJG = "不合格";
-			} else if (null == TJJG || "''".equals(TJJG)) {
-				TJJG = "办理中";
+            } else if ("''".equals(TJJG)) {
+                TJJG = "办理中";
 			}
 		} else {
 			if(null == TJJG || "".equals(TJJG)) {
@@ -1468,8 +1455,8 @@ public final class ConvertUtil {
 			String[] str = FBType.split(",");
 			if (StringUtils.isNoneBlank(str)) {
 				List<String> list = Arrays.asList(str);
-				if (null != list && !list.isEmpty()) {
-					if (list.contains("1")) {
+                if (!list.isEmpty()) {
+                    if (list.contains("1")) {
 						sb.append("姓名错误");
 						sb.append(",");
 					}

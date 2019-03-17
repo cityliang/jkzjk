@@ -1,15 +1,14 @@
 package com.huntto.dao;
 
-import java.util.List;
-
 import com.huntto.entity.CyryQRIMG;
 import com.huntto.entity.CyryVo;
 import com.huntto.entity.CyryVo1;
 import com.huntto.entity.CyryVo3;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Mapper
 @Repository
@@ -37,8 +36,8 @@ public interface OlexamCyryJbxxDao {
 	
 	/**
 	 * 通过从业人员ID查询体检机构名称
-	 * @param cyry_id
-	 * @return
+	 * @param cyry_id 从业人员ID
+	 * @return 体检机构名称
 	 */
 	String selectFZJG(String cyry_id);
 
@@ -57,7 +56,7 @@ public interface OlexamCyryJbxxDao {
 	 * 通过身份证号查询人员id 和该人员二维码信息
 	 * 
 	 * @param idCard idCard
-	 * @return
+	 * @return 人员id 和该人员二维码信息
 	 */
 	CyryVo1 selectCYRYID(String idCard);
 
@@ -65,7 +64,7 @@ public interface OlexamCyryJbxxDao {
 	 * 通过人员ID 查询该人员二维码
 	 * 
 	 * @param ID ID
-	 * @return
+	 * @return 人员二维码
 	 */
 	List<CyryQRIMG> selectQRCODE1(String ID);
 }

@@ -160,12 +160,8 @@ public class CyryServiceImpl implements CyryService {
 		map.put("user_id", user_id);
 		map.put("psw", psw);
 		List list = cyryDao.findLogin(map);
-		if (list.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+        return list.size() > 0;
+    }
 
 	@Override
 	public Map queryPhoto(String FZSJ) {

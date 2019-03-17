@@ -1,12 +1,11 @@
 package com.huntto.dao;
 
-import java.util.List;
-
+import com.huntto.entity.FeedBack;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.huntto.entity.FeedBack;
+import java.util.List;
 
 @Mapper
 @Repository
@@ -20,33 +19,33 @@ public interface FeedBackDao {
 	
 	/**
 	 * 修改反馈数据
-	 * @param feedBack
-	 * @return
-	 */
+     * @param feedBack feedBack
+     * @return int
+     */
 	int updateFeedBack(FeedBack feedBack);
 	/**
 	 * 查询所有反馈信息
-	 * 
-	 * @param feedBack
-	 * @return
-	 */
+	 *
+     * @param feedBack feedBack
+     * @return List
+     */
 	List<FeedBack> selectFeedBack(FeedBack feedBack);
 
 	/**
 	 * 通过ID查询反馈信息
 	 * 
 	 * @param ID ID
-	 * @return
-	 */
+     * @return FeedBack
+     */
 	FeedBack selectFeedBackByID(@Param("ID") String ID);
 
 	/**
 	 * 插入反馈数据
-	 * 
-	 * @param FBType    反馈类型
-	 * @param FBContent 反馈内容
-	 * @param FeedBack  feedBack
-	 * @return
-	 */
+	 *
+     * FBType    反馈类型
+     * FBContent 反馈内容
+     * FeedBack  feedBack
+     * @return int
+     */
 	int insertFeedBack(FeedBack feedBack);
 }

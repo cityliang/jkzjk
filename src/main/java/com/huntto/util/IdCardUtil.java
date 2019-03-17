@@ -14,7 +14,7 @@ import java.util.Map;
  * Create_time 2018/12/8 21:13<br/>
  */
 public class IdCardUtil {
-	final static Map<Integer, String> zoneNum = new HashMap<Integer, String>();
+	private final static Map<Integer, String> zoneNum = new HashMap<Integer, String>();
 
 	static {
 		zoneNum.put(11, "北京");
@@ -54,8 +54,8 @@ public class IdCardUtil {
 		zoneNum.put(91, "国外");
 	}
 
-	final static int[] PARITYBIT = { '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2' };// 校验码
-	final static int[] POWER_LIST = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };// 加权因子wi
+	private final static int[] PARITYBIT = {'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};// 校验码
+	private final static int[] POWER_LIST = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};// 加权因子wi
 
 	/**
 	 * 验证身份证号有效性
@@ -110,10 +110,7 @@ public class IdCardUtil {
 			}
 		}
 		//校验“校验码”
-		if (idCard.length() == 15) {
-			return true;
-		}
+		return idCard.length() == 15 || cs[cs.length - 1] == PARITYBIT[power % 11];
 
-		return cs[cs.length - 1] == PARITYBIT[power % 11];
 	}
 }

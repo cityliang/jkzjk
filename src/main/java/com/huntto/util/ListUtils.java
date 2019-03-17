@@ -2,7 +2,6 @@ package com.huntto.util;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class ListUtils {
@@ -19,10 +18,8 @@ public class ListUtils {
 		if (mapa.size() != mapb.size()) {
 			return false;
 		}
-		Iterator it = mapa.keySet().iterator();
-		while (it.hasNext()) {
-			Object obj = it.next();
-			// 查询同一个obj，首先两边都要有，而且还要校验重复个数，就是map.value
+        for (Object obj : mapa.keySet()) {
+            // 查询同一个obj，首先两边都要有，而且还要校验重复个数，就是map.value
 			if (getFreq(obj, mapa) != getFreq(obj, mapb)) {
 				return false;
 			}
@@ -33,11 +30,10 @@ public class ListUtils {
 	/**
 	 * 以obj为key，可以防止重复，如果重复就value++ 这样实际上记录了元素以及出现的次数
 	 */
-	public static Map getCardinalityMap(Collection coll) {
-		Map count = new HashMap();
-		for (Iterator it = coll.iterator(); it.hasNext();) {
-			Object obj = it.next();
-			Integer c = (Integer) count.get(obj);
+    private static Map getCardinalityMap(Collection coll) {
+        Map count = new HashMap();
+        for (Object obj : coll) {
+            Integer c = (Integer) count.get(obj);
 			if (c == null)
 				count.put(obj, INTEGER_ONE);
 			else {
@@ -47,8 +43,8 @@ public class ListUtils {
 		return count;
 	}
 
-	private static final int getFreq(Object obj, Map freqMap) {
-		Integer count = (Integer) freqMap.get(obj);
+    private static int getFreq(Object obj, Map freqMap) {
+        Integer count = (Integer) freqMap.get(obj);
 		if (count != null) {
 			return count.intValue();
 		}

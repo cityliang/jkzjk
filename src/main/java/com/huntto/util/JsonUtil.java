@@ -1,11 +1,12 @@
 package com.huntto.util;
 
-import java.util.Map;
-import java.util.HashMap;
-import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -19,10 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Create_time 2018/12/10 10:57<br/>
  */
 public class JsonUtil {
-	
-	static ObjectMapper objectMapper;
-	 
-	static {
+
+    private static ObjectMapper objectMapper;
+
+    static {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper();
 		}

@@ -1,14 +1,5 @@
 package com.huntto.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -25,6 +16,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class HttpUtil {
 	private static Logger logger = Logger.getLogger(HttpUtil.class);
@@ -52,9 +51,8 @@ public class HttpUtil {
 			int code = response.getStatusLine().getStatusCode();
 			logger.info("请求URL：" + url + ";code：" + code);
 			if (code == HttpStatus.SC_OK) {
-				String result = EntityUtils.toString(response.getEntity());
-				return result;
-			}
+                return EntityUtils.toString(response.getEntity());
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -74,9 +72,8 @@ public class HttpUtil {
 			HttpClient client = HttpUtil.createDefault();
 			HttpPost request = new HttpPost(url);
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-			for (Iterator<String> iter = params.keySet().iterator(); iter.hasNext();) {
-				String key = (String) iter.next();
-				String value = String.valueOf(params.get(key));
+            for (String key : params.keySet()) {
+                String value = String.valueOf(params.get(key));
 				nvps.add(new BasicNameValuePair(key, value));
 			}
 			request.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
@@ -86,8 +83,8 @@ public class HttpUtil {
 			if (code == HttpStatus.SC_OK) {
 				in = new BufferedReader(
 						new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
-				StringBuffer sb = new StringBuffer("");
-				String line = "";
+                StringBuilder sb = new StringBuilder("");
+                String line = "";
 				String NL = System.getProperty("line.separator");
 				while ((line = in.readLine()) != null) {
 					sb.append(line + NL);
@@ -122,13 +119,10 @@ public class HttpUtil {
 			logger.info("请求URL：" + url + ";code：" + code);
 			if (code == HttpStatus.SC_OK) {
 				HttpEntity responseEntity = response.getEntity();
-				String jsonString = EntityUtils.toString(responseEntity);
-				return jsonString;
-			}
-			if (response != null) {
-				response.close();
-			}
-			httpclient.close();
+                return EntityUtils.toString(responseEntity);
+            }
+            response.close();
+            httpclient.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();

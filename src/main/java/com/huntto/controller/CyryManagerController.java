@@ -1,25 +1,21 @@
 package com.huntto.controller;
 
+import com.huntto.config.FaceRecognConfig;
+import com.huntto.config.WeiXinConfig;
+import com.huntto.util.FaceRecognUtil;
+import com.huntto.util.JsonUtil;
+import com.huntto.util.WeiXinUtil;
+import com.huntto.util.WxUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.huntto.config.FaceRecognConfig;
-import com.huntto.config.WeiXinConfig;
-import com.huntto.util.FaceDetectResult;
-import com.huntto.util.FaceRecognUtil;
-import com.huntto.util.FaceVerifyResult;
-import com.huntto.util.JsonUtil;
-import com.huntto.util.WeiXinUtil;
-import com.huntto.util.WxUtil;
 
 @RestController
 public class CyryManagerController {
@@ -45,11 +41,11 @@ public class CyryManagerController {
 	 * @return map
 	 * @throws Exception
 	 */
-	@GetMapping(value = "/test")
+    @GetMapping(value = "/getWxToken")
     public String test() throws Exception {
 		String access_token =  wUtil.getAccess_token1();
-		String url = "http://hzjkz.hzwsjsw.gov.cn";
-		Map map = new HashMap<>();
+        String url = "http://hzjkz.hzwsjsw.gov";
+        Map map = new HashMap<>();
 		map.put("access_token", access_token);
 		map.put("appId", wConfig.getAPPID());
 		map.put("timestamp", WxUtil.getTimestamp());

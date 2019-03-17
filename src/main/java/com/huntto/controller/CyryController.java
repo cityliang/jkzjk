@@ -1,17 +1,5 @@
 package com.huntto.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.axis.providers.java.MsgProvider;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huntto.entity.CyryVo1;
@@ -23,11 +11,20 @@ import com.huntto.service.OlexamCyryJbxxService;
 import com.huntto.util.IdCardUtil;
 import com.huntto.util.JsonUtil;
 import com.huntto.util.Nulls;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Description: 从业人员接口 <br/>
@@ -63,15 +60,15 @@ public class CyryController {
 	@ApiImplicitParam(paramType = "query", name = "idCard", value = "体检人员身份证号", dataType = "String", required = true)
 	@RequestMapping(value = { "/getPersonMsg2" }, method = RequestMethod.POST)
 	public String getPersonMsg2(String idCard) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
+        String json;
+        if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
 			Map map;
 			map = cyryService.selectCYRYVo1(idCard);
 			if (null != map && !"{}".equals(map.toString())) {
 				ObjectMapper mapper = new ObjectMapper();
 				json = mapper.writeValueAsString(map);
-			} else if ("{}".equals(map.toString())) {
-				json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+            } else if ("{}".equals(map != null ? map.toString() : null)) {
+                json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 			} else {
 				json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 			}
@@ -94,8 +91,8 @@ public class CyryController {
 	@ApiImplicitParam(paramType = "query", name = "idCard", value = "体检人员身份证号", dataType = "String", required = true)
 	@RequestMapping(value = { "/getPersonMsg1" }, method = RequestMethod.POST)
 	public String getPersonMsg1(String idCard) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
+        String json;
+        if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
 			Map map;
 			map = olexamCyryJbxxService.selectCYRYVO(idCard);
 			if (null != map && !"{}".equals(map.toString())) {
@@ -105,8 +102,8 @@ public class CyryController {
 					ObjectMapper mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
 				}
-			} else if ("{}".equals(map.toString())) {
-				json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+            } else if ("{}".equals(map != null ? map.toString() : null)) {
+                json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 			} else {
 				json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 			}
@@ -171,13 +168,13 @@ public class CyryController {
 				if (null != map && !"{}".equals(map.toString())) {
 					mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
-				} else if ("{}".equals(map.toString())) {
-					json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+                } else if ("{}".equals(map != null ? map.toString() : null)) {
+                    json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 				} else {
 					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 				}
-			}else if (null != map && !"{}".equals(map.toString())) {
-				if("不合格".equals(map.get("TJJG"))) {
+            } else if (!"{}".equals(map.toString())) {
+                if("不合格".equals(map.get("TJJG"))) {
 					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
 				}else {
 					mapper = new ObjectMapper();
@@ -199,8 +196,8 @@ public class CyryController {
 						mapper = new ObjectMapper();
 						json = mapper.writeValueAsString(map);
 					}
-				} else if ("{}".equals(map.toString())) {
-					json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+                } else if ("{}".equals(map != null ? map.toString() : null)) {
+                    json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 				} else {
 					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 				}
@@ -213,8 +210,8 @@ public class CyryController {
 
 		return json;
 	}
-	
-	public Map toMapList(List<CyryVo1> list, Map map) {
+
+    private Map toMapList(List<CyryVo1> list, Map map) {
         map.clear();
         List<CyryVo2> list2 = new ArrayList<>();
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
@@ -258,8 +255,8 @@ public class CyryController {
 	 * 
 	 * @param FBType    反馈类型
 	 * @param FBContent 反馈内容
-	 * @return
-	 * @throws JsonProcessingException JsonProcessingException
+     * @return String
+     * @throws JsonProcessingException JsonProcessingException
 	 */
 	@ApiOperation(value = "反馈接口", notes = "插入反馈信息")
 	@ApiImplicitParams({
@@ -269,8 +266,8 @@ public class CyryController {
 //	@ApiResponses(value = { @ApiResponse(code = 401, message = "反馈失败") })
 	@RequestMapping(value = { "/feedback" }, method = RequestMethod.POST)
 	public String feedback(String IDCARD, String FBType, String FBContent) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(IDCARD, FBType, FBContent)) {
+        String json;
+        if (Nulls.validateValue(IDCARD, FBType, FBContent)) {
 			int count = feedBackService.insertFeedBack(IDCARD, FBType, FBContent);
 			if (1 == count) {
 				json = JsonUtil.jsonStr("msg", "反馈成功");
@@ -292,8 +289,8 @@ public class CyryController {
 	@RequestMapping(value = { "/selectFeedBack" }, method = RequestMethod.POST)
 	public String selectFeedBack(FeedBack feedBack) throws JsonProcessingException {
 		Map map = new HashMap<>();
-		String json = "";
-		if (Nulls.validateValue(feedBack.getID())) {
+        String json;
+        if (Nulls.validateValue(feedBack.getID())) {
 			feedBack = feedBackService.selectFeedBackByID(feedBack.getID());
 			if (null != feedBack) {
 				if (StringUtils.isNotBlank(feedBack.getFBType()) && StringUtils.isNotBlank(feedBack.getFBContent())) {
@@ -324,11 +321,11 @@ public class CyryController {
 	
 	/**
 	 * 反馈接口-更新已处理字段
-	 * 
-	 * @param FBType    反馈类型
-	 * @param FBContent 反馈内容
-	 * @return
-	 * @throws JsonProcessingException JsonProcessingException
+	 *
+     * FBType    反馈类型
+     * FBContent 反馈内容
+     * @return String
+     * @throws JsonProcessingException JsonProcessingException
 	 */
 	@ApiOperation(value = "更新已处理字段接口", notes = "更新反馈是否处理信息")
 	@ApiImplicitParams({
@@ -337,8 +334,8 @@ public class CyryController {
 	})
 	@RequestMapping(value = { "/updateFeedBack" }, method = RequestMethod.POST)
 	public String updateFeedBack(FeedBack feedBack) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(feedBack.getIS_CL(), feedBack.getID())) {
+        String json;
+        if (Nulls.validateValue(feedBack.getIS_CL(), feedBack.getID())) {
 			int count = feedBackService.updateFeedBack(feedBack);
 			if (1 == count) {
 				json = JsonUtil.jsonStr("msg", "更新数据成功");
@@ -366,22 +363,21 @@ public class CyryController {
 	@ApiImplicitParam(paramType = "query", name = "PHOTO", value = "体检人员头像", dataType = "String", required = true)})
 	@RequestMapping(value = { "/faceRecognition" }, method = RequestMethod.POST)
 	public String faceRecognition(String NAME,String PHOTO) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(NAME,PHOTO)) {
+        String json;
+        if (Nulls.validateValue(NAME,PHOTO)) {
 			Map map = olexamCyryJbxxService.verifyPicture(NAME,PHOTO);
 			if (null != map && !"{}".equals(map.toString())) {
 				if(map.containsKey("msg")) {
 					String mString = String.valueOf(map.get("msg"));
 					json = JsonUtil.jsonStr("msg", mString);
-				}
-				if("不合格".equals(map.get("TJJG"))) {
-					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
+                } else if ("不合格".equals(map.get("TJJG"))) {
+                    json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
 				}else {
 					ObjectMapper mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
 				}
-			} else if ("{}".equals(map.toString())) {
-				json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+            } else if ("{}".equals(map != null ? map.toString() : null)) {
+                json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
 			} else {
 				json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 			}
@@ -406,17 +402,16 @@ public class CyryController {
 	@ApiImplicitParam(paramType = "query", name = "PHOTO", value = "体检人员头像", dataType = "String", required = true)})
 	@RequestMapping(value = { "/faceRecognition1" }, method = RequestMethod.POST)
 	public String faceRecognition1(String NAME,String PHOTO) throws JsonProcessingException {
-		String json = "";
-		if (Nulls.validateValue(NAME,PHOTO)) {
+        String json;
+        if (Nulls.validateValue(NAME,PHOTO)) {
 			Map map = new HashMap<>();
 //			map = olexamCyryJbxxService.verifyPicture1(NAME,PHOTO);
-			if (null != map && !"{}".equals(map.toString())) {
-				if(map.containsKey("msg")) {
+            if (!"{}".equals(map.toString())) {
+                if(map.containsKey("msg")) {
 					String mString = String.valueOf(map.get("msg"));
 					json = JsonUtil.jsonStr("msg", mString);
-				}
-				if("不合格".equals(map.get("TJJG"))) {
-					json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
+                } else if ("不合格".equals(map.get("TJJG"))) {
+                    json = JsonUtil.jsonStr("msg", "请联系有关体检机构，咨询相关信息，谢谢！");
 				}else {
 					ObjectMapper mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);

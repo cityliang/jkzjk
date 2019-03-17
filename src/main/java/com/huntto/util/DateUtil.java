@@ -17,8 +17,8 @@ public class DateUtil {
 	 * 日期转字符串 格式 yyyy-MM-dd 年-月-日
 	 * 
 	 * @param date date
-	 * @return
-	 */
+     * @return 日期转字符串
+     */
 	public static String Date2String1(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String str = sdf.format(date);
@@ -29,8 +29,8 @@ public class DateUtil {
 	 * 日期转字符串 格式 yyyy-MM-dd HH:mm:ss 年-月-日 时:分:秒
 	 * 
 	 * @param date date
-	 * @return
-	 */
+     * @return 日期转字符串
+     */
 	public static String Date2String2(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String str = sdf.format(date);

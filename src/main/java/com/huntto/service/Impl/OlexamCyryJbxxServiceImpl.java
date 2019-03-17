@@ -1,6 +1,5 @@
 package com.huntto.service.Impl;
 
-import com.alibaba.cloud.faceengine.*;
 import com.huntto.dao.OlexamCyryJbxxDao;
 import com.huntto.entity.CyryQRIMG;
 import com.huntto.entity.CyryVo1;
@@ -9,7 +8,6 @@ import com.huntto.service.OlexamCyryJbxxService;
 import com.huntto.util.FaceDetectResult;
 import com.huntto.util.FaceRecognUtil;
 import com.huntto.util.FaceVerifyResult;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -202,7 +200,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
 //						list1.add(cyryVo1);
 //					}
 //				}
-                if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
+                if (!list.isEmpty() && !"[]".equals(list.toString())) {
                     if (list.size() == 1) {
                         map = toMap(list, map);
                         return toMap(list, map);
@@ -230,7 +228,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         return map;
     }
 
-    public Map toMap(List<CyryVo1> list, Map map) {
+    private Map toMap(List<CyryVo1> list, Map map) {
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {
         	CyryVo1 cyryVo1 = list.get(0);
             if (cyryVo1 != null) {
@@ -504,8 +502,8 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         					return map;
         				}
         			}
-        			if (null != map1 && !"{}".equals(map1.toString())) {
-        				// 调用对比接口API获取相似度
+                    if (!"{}".equals(map1.toString())) {
+                        // 调用对比接口API获取相似度
         				idcard = String.valueOf(map1.get(getMaxKey(map1)));
         				similarity = (float)getMaxKey(map1);
         				if(similarity > 67.05F) {//confidence > 60.03时误识率< 1/1000, confidence > 67.05时误识率< 1/10000, confidence > 75.45时误识率< 1/100000, 
@@ -660,10 +658,10 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     /**
      * 求Map<K,V>中Key(键)的最大值
      *
-     * @param map
-     * @return
+     * @param map map
+     * @return Map<K,V>中Key(键)的最大值
      */
-    Object getMaxKey(Map map) {
+    private Object getMaxKey(Map map) {
         if (map == null) return null;
         Set set = map.keySet();
         Object[] obj = set.toArray();
@@ -674,10 +672,10 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
     /**
      * 通过身份证号获取健康证信息
      *
-     * @param idCard
-     * @return
+     * @param idCard  身份证号
+     * @return 健康证信息
      */
-    Map getJKZXXbyIdcard(String idCard) {
+    private Map getJKZXXbyIdcard(String idCard) {
         Map map = new HashMap();
         List<CyryVo1> list = olexamCyryJbxxDao.selectCYRYVo1(idCard.trim());
         if (null != list && !list.isEmpty() && !"[]".equals(list.toString())) {

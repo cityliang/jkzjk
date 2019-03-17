@@ -13,9 +13,9 @@ public interface CyryService {
 	
 	/**
 	 * 判断用户名和密码是不是正确
-	 * 
-	 * @param map map
-	 * @return
+	 *
+     * @param user_id user_id
+     * @return
 	 */
 	boolean findLogin(String user_id, String psw);
 
