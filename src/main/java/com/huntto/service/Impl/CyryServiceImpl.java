@@ -1,14 +1,5 @@
 package com.huntto.service.Impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.huntto.dao.CyryDao;
 import com.huntto.dao.OlexamCyryJbxxDao;
 import com.huntto.entity.CyryQRIMG;
@@ -16,6 +7,14 @@ import com.huntto.entity.CyryVo1;
 import com.huntto.service.CyryService;
 import com.huntto.util.ConvertUtil;
 import com.huntto.util.FileUtil;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class CyryServiceImpl implements CyryService {
@@ -29,7 +28,7 @@ public class CyryServiceImpl implements CyryService {
 		this.cyryDao = cyryDao;
 		this.olexamCyryJbxxDao = olexamCyryJbxxDao;
 	}
-	
+
 	@Override
 	public Map selectCYRYVo1(String idCard) {
 		Map map = new HashMap();

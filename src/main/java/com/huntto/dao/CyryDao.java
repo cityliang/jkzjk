@@ -1,13 +1,12 @@
 package com.huntto.dao;
 
-import java.util.List;
-import java.util.Map;
-
+import com.huntto.entity.CyryQRIMG;
+import com.huntto.entity.CyryVo1;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import com.huntto.entity.CyryQRIMG;
-import com.huntto.entity.CyryVo1;
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository

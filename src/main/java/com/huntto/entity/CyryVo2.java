@@ -3,9 +3,6 @@ package com.huntto.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 /**
  * Description: 健康证查询人员信息Vo <br/>
  * Copyright: 版权归浙江创得信息技术有限公司所有<br/>
@@ -17,9 +14,7 @@ import javax.persistence.Id;
  */
 @Data
 @NoArgsConstructor
-@Entity
 public class CyryVo2 {
-    @Id
 //	private String ID;// ID
 //	private String BH;// 编号
     private String XM;// 姓名
