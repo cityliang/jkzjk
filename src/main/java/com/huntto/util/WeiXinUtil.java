@@ -2,9 +2,11 @@ package com.huntto.util;
 
 import com.huntto.config.WeiXinConfig;
 import com.huntto.entity.wx.AccessToken;
+import com.huntto.entity.wx.JsapiTicket;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -18,28 +20,35 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 @Slf4j
-@Configuration
+@Component
 public class WeiXinUtil {
 	
 	@Autowired
 	private WeiXinConfig wConfig;
 	
     /**全局token 所有与微信有交互的前提 */  
-    public static String ACCESS_TOKEN;  
+    public static String WX_ACCESS_TOKEN;
       
     /**全局token上次获取事件 */  
-    public static long LASTTOKENTIME;  
-      
+    public static long WX_ACCESS_TOKEN_LASTTOKENTIME;
+    
+    /**全局token 所有与微信有交互的前提 */  
+    public static String WX_TICKET;
+    
+    /**全局token上次获取事件 */  
+    public static long WX_TICKET_LASTTOKENTIME;
+
     /** 
      * 获取全局token方法 
      * 该方法通过使用HttpClient发送http请求，HttpGet()发送请求 
      * 微信返回的json中access_token是我们的全局token 
-     */  
-    public synchronized String getAccess_token(){
+     */
+    @Deprecated
+    public synchronized String getAccess_token1(){
     	URL url;
     	String sCurrentLine = "";
 		StringBuilder sTotalString = new StringBuilder();
-		if(ACCESS_TOKEN == null || System.currentTimeMillis() - LASTTOKENTIME > 7000*1000){
+		if(WX_ACCESS_TOKEN == null || System.currentTimeMillis() - WX_ACCESS_TOKEN_LASTTOKENTIME > 7000*1000){
             try {  
                 //请求access_token地址  
                 String urlStr = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+wConfig.getAPPID()+"&secret="+wConfig.getAPPSECRET(); 
@@ -60,10 +69,10 @@ public class WeiXinUtil {
 					if (aToken != null) {
 						System.out.println(aToken.getAccess_token());
 						//给静态变量赋值，获取到access_token
-						ACCESS_TOKEN = aToken.getAccess_token();
+						WX_ACCESS_TOKEN = aToken.getAccess_token();
 						//给获取access_token时间赋值，方便下此次获取时进行判断
-						LASTTOKENTIME = System.currentTimeMillis();
-						return ACCESS_TOKEN;
+						WX_ACCESS_TOKEN_LASTTOKENTIME = System.currentTimeMillis();
+						return WX_ACCESS_TOKEN;
 					}
 				} else {
     				System.err.println("失败");
@@ -72,7 +81,7 @@ public class WeiXinUtil {
 				e.printStackTrace();
             }
         }
-    	return ACCESS_TOKEN;
+    	return WX_ACCESS_TOKEN;
     }
     
 	// 定制Verifier
@@ -81,12 +90,15 @@ public class WeiXinUtil {
  			return true;
  		}
  	}
-    
-    public synchronized String getAccess_token1(){
+    /**
+     * 获取全局 ACCESS_TOKEN
+     * @return
+     */
+    public synchronized String getAccess_token(){
     	URL url;
     	String sCurrentLine = "";
 		String sTotalString = "";
-        if(ACCESS_TOKEN == null || System.currentTimeMillis() - LASTTOKENTIME > 7000*1000){
+        if(WX_ACCESS_TOKEN == null || System.currentTimeMillis() - WX_ACCESS_TOKEN_LASTTOKENTIME > 7000*1000){
             //请求access_token地址 
         	List<String> list = wConfig.getIplist();
 			for (String aList : list) {
@@ -109,14 +121,20 @@ public class WeiXinUtil {
 						AccessToken aToken = JsonUtil.readValue(sTotalString, AccessToken.class);
 						//给静态变量赋值，获取到access_token
 						if (aToken != null) {
-							ACCESS_TOKEN = aToken.getAccess_token();
-							//给获取access_token时间赋值，方便下此次获取时进行判断
-							LASTTOKENTIME = System.currentTimeMillis();
-							long endTime = System.currentTimeMillis(); //获取结束时间
-							log.info("程序运行时间： " + (endTime - startTime) + "ms");
-							if (ACCESS_TOKEN != null) {
-								return ACCESS_TOKEN;
+							if(aToken.getErrcode() != null && aToken.getErrcode().equals("40164")) {
+								return sTotalString;
+							}else {
+								WX_ACCESS_TOKEN = aToken.getAccess_token();
+								//给获取access_token时间赋值，方便下此次获取时进行判断
+								WX_ACCESS_TOKEN_LASTTOKENTIME = System.currentTimeMillis();
+								long endTime = System.currentTimeMillis(); //获取结束时间
+								log.info("程序运行时间： " + (endTime - startTime) + "ms");
+								if (WX_ACCESS_TOKEN != null) {
+									return WX_ACCESS_TOKEN;
+								}
 							}
+						}else {
+							return sTotalString;
 						}
 					} else {
 						log.info("不可以使用的IP为" + aList);
@@ -127,10 +145,62 @@ public class WeiXinUtil {
 				}
 			}
 		}
-        return ACCESS_TOKEN;
+        return WX_ACCESS_TOKEN;
     }
-    
-    public static void main(String[] args) {  
-//        getAccess_token();  
-    }  
+    /**
+     * 获取全局Ticket
+     * @return
+     */
+    public synchronized String getWXJsapiTicket(){
+    	URL url;
+    	String sCurrentLine = "";
+		String sTotalString = "";
+        if(WX_TICKET == null || System.currentTimeMillis() - WX_TICKET_LASTTOKENTIME > 7000*1000){
+        	List<String> list = wConfig.getIplist();
+			for (String aList : list) {
+				long startTime = System.currentTimeMillis();   //获取开始时间
+				String urlStr = "https://" + aList + "/cgi-bin/ticket/getticket?access_token=" + WeiXinUtil.WX_ACCESS_TOKEN + "&type=jsapi";
+				log.info("当前访问的微信urlStr为: " + urlStr);
+				try {
+					url = new URL(urlStr);
+					URLConnection URLconnection = url.openConnection();
+					HttpsURLConnection httpConnection = (HttpsURLConnection) URLconnection;
+					httpConnection.setHostnameVerifier(new WeiXinUtil().new TrustAnyHostnameVerifier());
+					int responseCode = httpConnection.getResponseCode();
+					if (responseCode == HttpURLConnection.HTTP_OK) {
+						log.info("可以使用的IP为" + aList);
+						InputStream urlStream = httpConnection.getInputStream();
+						BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlStream));
+						while ((sCurrentLine = bufferedReader.readLine()) != null) {
+							sTotalString += sCurrentLine;
+						}
+						JsapiTicket jTicket = JsonUtil.readValue(sTotalString, JsapiTicket.class);
+						//给静态变量赋值，获取到access_token
+						if (jTicket != null) {
+							if(jTicket.getErrcode() != null && jTicket.getErrcode().equals("40164")) {
+								return sTotalString;
+							}else {
+								WX_TICKET = jTicket.getTicket();
+								//给获取access_token时间赋值，方便下此次获取时进行判断
+								WX_TICKET_LASTTOKENTIME = System.currentTimeMillis();
+								long endTime = System.currentTimeMillis(); //获取结束时间
+								log.info("程序运行时间： " + (endTime - startTime) + "ms");
+								if (WX_TICKET != null) {
+									return WX_TICKET;
+								}
+							}
+						}else {
+							return sTotalString;
+						}
+					} else {
+						log.info("不可以使用的IP为" + aList);
+					}
+				} catch (IOException e) {
+					log.info("当前访问的微信urlStr为: " + urlStr);
+					e.printStackTrace();
+				}
+			}
+		}
+        return WX_TICKET;
+    }
 }

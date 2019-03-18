@@ -17,14 +17,16 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import com.huntto.config.FaceRecognConfig;
+import com.huntto.entity.face.FaceDetectResult;
+import com.huntto.entity.face.FaceVerifyResult;
 
 import lombok.Data;
 
 @Data
-@Configuration
+@Component
 public class FaceRecognUtil {
 	@Autowired
 	private FaceRecognConfig faceRecognConfig;

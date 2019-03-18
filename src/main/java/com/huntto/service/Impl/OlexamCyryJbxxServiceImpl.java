@@ -1,13 +1,12 @@
 package com.huntto.service.Impl;
 
-import com.huntto.dao.OlexamCyryJbxxDao;
-import com.huntto.entity.CyryQRIMG;
-import com.huntto.entity.CyryVo1;
-import com.huntto.entity.CyryVo3;
-import com.huntto.service.OlexamCyryJbxxService;
-import com.huntto.util.FaceDetectResult;
-import com.huntto.util.FaceRecognUtil;
-import com.huntto.util.FaceVerifyResult;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,7 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import com.huntto.dao.OlexamCyryJbxxDao;
+import com.huntto.entity.CyryQRIMG;
+import com.huntto.entity.CyryVo1;
+import com.huntto.entity.CyryVo3;
+import com.huntto.entity.face.FaceDetectResult;
+import com.huntto.entity.face.FaceVerifyResult;
+import com.huntto.service.OlexamCyryJbxxService;
+import com.huntto.util.FaceRecognUtil;
 
 @Service
 public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {

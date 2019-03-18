@@ -42,18 +42,14 @@ public class CyryManagerController {
 	 * @throws Exception
 	 */
     @GetMapping(value = "/getWxToken")
-    public String test() throws Exception {
-		String access_token =  wUtil.getAccess_token1();
-        String url = "http://hzjkz.hzwsjsw.gov";
+    public String test(String url) throws Exception {
+		String access_token =  wUtil.getAccess_token();
         Map map = new HashMap<>();
 		map.put("access_token", access_token);
 		map.put("appId", wConfig.getAPPID());
 		map.put("timestamp", WxUtil.getTimestamp());
 		map.put("nonceStr", WxUtil.getNoncestr());
 		map.put("signature", WxUtil.getJsSdkSign1(WxUtil.getNoncestr(), wxUtil.getJsapiTicket(), WxUtil.getTimestamp(), url));
-		List jsApiList = new ArrayList<>();
-		jsApiList.add(url);
-		map.put("jsApiList", jsApiList);
 		return JsonUtil.toJSon(map);
     }
 	

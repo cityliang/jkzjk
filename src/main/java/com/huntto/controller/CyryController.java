@@ -2,6 +2,7 @@ package com.huntto.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.huntto.config.WeiXinConfig;
 import com.huntto.entity.CyryVo1;
 import com.huntto.entity.CyryVo2;
 import com.huntto.entity.FeedBack;
@@ -11,12 +12,18 @@ import com.huntto.service.OlexamCyryJbxxService;
 import com.huntto.util.IdCardUtil;
 import com.huntto.util.JsonUtil;
 import com.huntto.util.Nulls;
+import com.huntto.util.WeiXinUtil;
+import com.huntto.util.WxUtil;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +42,7 @@ import java.util.Map;
  * Email city_wangyi@163.com<br/>
  * Create_time 2018/12/10 15:40<br/>
  */
+@Slf4j
 @RestController
 @Api("健康证-从业人员相关接口")
 @RequestMapping("/api")
@@ -47,6 +55,43 @@ public class CyryController {
 	
 	@Autowired
 	private OlexamCyryJbxxService olexamCyryJbxxService;
+	
+	@Autowired
+	private WeiXinConfig wConfig;
+	
+	@Autowired
+	private WeiXinUtil wUtil;
+	
+	@Autowired
+	private WxUtil wxUtil;
+	
+	/**
+	 * 通过config接口注入权限验证配置
+	 * @return url 
+	 * @throws Exception
+	 */
+    @GetMapping(value = "/getWxToken")
+    public String test(String url) throws Exception {
+		String access_token = wUtil.getAccess_token();
+		String ticket = wUtil.getWXJsapiTicket();
+		String timestamp = WxUtil.getTimestamp();
+		String nonceStr = WxUtil.getNoncestr();
+		String signature = wxUtil.getJsSdkSign(nonceStr, ticket, timestamp, url);
+		log.info("url："+url);
+		log.info("access_token："+access_token);
+		log.info("timestamp："+timestamp);
+		log.info("ticket："+ticket);
+		log.info("nonceStr："+nonceStr);
+		log.info("signature："+signature);
+        Map map = new HashMap<>();
+		map.put("access_token", access_token);
+		map.put("ticket", ticket);
+		map.put("appId", wConfig.getAPPID());
+		map.put("timestamp", timestamp);
+		map.put("nonceStr", nonceStr);
+		map.put("signature", signature);
+		return JsonUtil.toJSon(map);
+    }
 	
 	/**
 	 * 获取人员信息接口

@@ -1,4 +1,4 @@
-package com.huntto.util;
+package com.huntto.entity.face;
 
 import lombok.Data;
 

@@ -4,6 +4,14 @@ import lombok.Data;
 
 @Data
 public class AccessToken {
+	/**
+     * 微信公众号的 错误代码
+     */
+    private String errcode;
+    /**
+     * 微信公众号的 错误信息
+     */
+    private String errmsg;
     /**
      * 微信公众号的  access_token
      */

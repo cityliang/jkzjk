@@ -1,13 +1,14 @@
 package com.huntto.config;
 
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
 @Data
-@Configuration
+@Component
 public class WeiXinConfig {
 
 	/**

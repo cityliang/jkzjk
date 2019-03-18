@@ -156,14 +156,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.0.10.Final</version>
-        </dependency>
-		
-		<!--添加hibernate-core 5.0.11.Final依赖，原因：5.0.12版本里面缺少OptimisticLockException类-->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.0.10.Final</version>
+            <version>5.0.11.Final</version>
         </dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->

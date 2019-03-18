@@ -6,9 +6,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.alibaba.cloud.faceengine.Error;
 import com.alibaba.cloud.faceengine.FaceEngine;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Description: 启动类 <br/>
@@ -19,11 +22,12 @@ import com.alibaba.cloud.faceengine.FaceEngine;
  * Email city_wangyi@163.com<br/>
  * Create_time 2018/12/8 8:33<br/>
  */
-@SpringBootApplication
 //        (exclude = { DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
 //@EnableWebMvc
+@Slf4j
+@EnableScheduling
+@SpringBootApplication
 public class JkzjkAPP extends SpringBootServletInitializer {
-	private static Logger log = LoggerFactory.getLogger(JkzjkAPP.class);
 	/**
 	 * 人脸识别授权码
 	 */

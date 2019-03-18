@@ -1,17 +1,5 @@
 package com.huntto.util;
 
-import com.huntto.config.WeiXinConfig;
-import com.huntto.entity.wx.AccessToken;
-import com.huntto.entity.wx.JsapiTicket;
-import com.huntto.entity.wx.WxIPList;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,28 +10,43 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.huntto.config.WeiXinConfig;
+import com.huntto.entity.wx.AccessToken;
+import com.huntto.entity.wx.JsapiTicket;
+import com.huntto.entity.wx.WxIPList;
+
+import lombok.extern.slf4j.Slf4j;
 @Slf4j
+@Component
 @RestController
-@Configuration
 public class WxUtil {
 	
 	@Autowired
 	private WeiXinConfig wConfig;
+	
 	/**
 	 * 获取access_token
 	 *
      * @throws Exception Exception
      */
-	@Test
 	@RequestMapping("/getAccessToken")
 	public String getAccessToken() throws Exception {
 		List<String> list = wConfig.getIplist();
         for (String aList : list) {
             String urlStr = "https://" + aList + "/cgi-bin/token?grant_type=client_credential&appid=" + wConfig.getAPPID() + "&secret=" + wConfig.getAPPSECRET();
-            log.info("当前访问的微信urlStr为: " + urlStr);
+            log.info("getAccessToken 当前访问的微信urlStr为: " + urlStr);
             try {
                 String str = processUrl(urlStr);
                 AccessToken aToken = JsonUtil.readValue(str, AccessToken.class);
@@ -51,42 +54,32 @@ public class WxUtil {
                     return aToken.getAccess_token();
                 }
             } catch (IOException e) {
-                log.info("当前访问的微信urlStr为: " + urlStr);
+                log.info("getAccessToken 当前访问的微信urlStr为: " + urlStr);
                 e.printStackTrace();
             }
         }
         return null;
 	}
 	
-	@Test
 	@RequestMapping("/getcallbackip")
 	public String getcallbackip() throws Exception {
 //		urlStr += "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
-		WeiXinUtil.ACCESS_TOKEN = getAccessToken();
+		WeiXinUtil.WX_ACCESS_TOKEN = getAccessToken();
 		List<String> ipList = wConfig.getIplist();
 		String urlStr = "";
 		if(ipList != null && !ipList.isEmpty()) {
 			for(String str:ipList) {
-				urlStr += "https://"+str+"/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
-				log.info("当前访问的微信IP为: "+str);
-				log.info("当前访问的微信urlStr为: "+urlStr);
+				urlStr += "https://"+str+"/cgi-bin/getcallbackip?access_token="+WeiXinUtil.WX_ACCESS_TOKEN;
+				log.info("getcallbackip 当前访问的微信IP为: "+str);
+				log.info("getcallbackip 当前访问的微信urlStr为: "+urlStr);
 				try {
 					String string = processUrl(urlStr);
 					log.info("string: "+string);
 					WxIPList wIpList = JsonUtil.readValue(string, WxIPList.class);
                     String[] strings = wIpList != null ? wIpList.getIp_list() : new String[0];
-                    log.info("微信服务器IP数组为： " + Arrays.toString(strings));
-//					List list = Arrays.asList(strings);
-//					if(!ListUtils.isEqualCollection(list,wConfig.getIplist())) {
-//						str = (String) list.get(random.nextInt(ipList.size()));
-//						urlStr += "https://"+str+"/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
-//						WxIPList wIpList1 = mapper.readValue(processUrl(urlStr), WxIPList.class);
-//						String [] strings1 = wIpList.getIp_list();
-//						List list1 = Arrays.asList(strings);
-//						wConfig.setIplist(list1);
-//					}
+                    log.info("getcallbackip 微信服务器IP数组为： " + Arrays.toString(strings));
 				} catch (IOException e) {
-					log.info("当前访问的微信urlStr为: "+urlStr);
+					log.info("getcallbackip 当前访问的微信urlStr为: "+urlStr);
 					e.printStackTrace();
                 }
             }
@@ -103,14 +96,14 @@ public class WxUtil {
 	public String getJsapiTicket() throws Exception {
 		List<String> list = wConfig.getIplist();
         for (String aList : list) {
-            String urlStr = "https://" + aList + "/cgi-bin/ticket/getticket?access_token=" + WeiXinUtil.ACCESS_TOKEN + "&type=jsapi";
-            log.info("当前访问的微信urlStr为: " + urlStr);
+            String urlStr = "https://" + aList + "/cgi-bin/ticket/getticket?access_token=" + WeiXinUtil.WX_ACCESS_TOKEN + "&type=jsapi";
+            log.info("getJsapiTicket 当前访问的微信urlStr为: " + urlStr);
             try {
                 String str = processUrl(urlStr);
                 JsapiTicket jTicket = JsonUtil.readValue(str, JsapiTicket.class);
                 return jTicket != null ? jTicket.getTicket() : null;
             } catch (IOException e) {
-                log.info("当前访问的微信urlStr为: " + urlStr);
+                log.info("getJsapiTicket 当前访问的微信urlStr为: " + urlStr);
                 e.printStackTrace();
             }
         }
@@ -123,11 +116,7 @@ public class WxUtil {
      */
 	@RequestMapping("/getJsSdkSign")
 	public String getJsSdkSign(String noncestr,String tsapiTicket,String timestamp,String url) throws Exception {
-//		String noncestr = request.getParameter("noncestr");
-//		String tsapiTicket = request.getParameter("jsapi_ticket");
-//		String timestamp = request.getParameter("timestamp");
-//		String url = request.getParameter("url");
-        return getJsSdkSign1(WxUtil.getNoncestr(), tsapiTicket, WxUtil.getTimestamp(), url);
+        return getJsSdkSign1(noncestr, tsapiTicket, timestamp, url);
     }
 
     /**
@@ -159,7 +148,6 @@ public class WxUtil {
         }
         return sTotalString.toString();
     }
-
 	/**
 	 * 获得加密后的签名
      *
@@ -173,7 +161,7 @@ public class WxUtil {
 		String content = "jsapi_ticket=" + tsapiTicket + "&noncestr=" + noncestr + "&timestamp=" + timestamp + "&url=" + url;
         return getSha1(content);
     }
-
+	
 	/**
 	 * 进行sha1加密
      *
@@ -202,19 +190,19 @@ public class WxUtil {
 			return null;
 		}
 	}
-	
+    
 	/** 
 	 * 获取精确到秒的时间戳 
      * @return 时间戳
      */
     public static String getTimestamp() {
-        return String.valueOf(new Date().getTime()/1000);
+        return String.valueOf(System.currentTimeMillis() / 1000);
     }
 
 	/**
 	 * 获得随机串
 	 */
 	public static String getNoncestr() {
-		return UUID.randomUUID().toString();
+		return UUID.randomUUID().toString().replace("-", "").substring(0, 16);
 	}
 }
