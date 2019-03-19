@@ -98,6 +98,7 @@ public class TestController {
 	@Autowired
 	private CyryService cyryService;
 
+	@Deprecated
 	@ApiOperation(value = "导出二维码和人员头像", notes = "待测，未完成")
 	@RequestMapping(value = { "/tbPhoto" }, method = RequestMethod.POST)
 	public String photo(String FZSJ) throws JsonProcessingException {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/hello",produces = MediaType.APPLICATION_JSON_VALUE)
 public class PoiWordController {
+	@Deprecated
 	@RequestMapping(value = "/word",method = RequestMethod.GET)
     public String helloWord(@RequestParam(value = "name") String string){
         return string;

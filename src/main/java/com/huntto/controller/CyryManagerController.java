@@ -52,7 +52,7 @@ public class CyryManagerController {
 		map.put("signature", WxUtil.getJsSdkSign1(WxUtil.getNoncestr(), wxUtil.getJsapiTicket(), WxUtil.getTimestamp(), url));
 		return JsonUtil.toJSon(map);
     }
-	
+	@Deprecated
 	public String register() {
 
 		return "";

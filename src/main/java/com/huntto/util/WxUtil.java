@@ -10,9 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -78,6 +76,7 @@ public class WxUtil {
 					WxIPList wIpList = JsonUtil.readValue(string, WxIPList.class);
                     String[] strings = wIpList != null ? wIpList.getIp_list() : new String[0];
                     log.info("getcallbackip 微信服务器IP数组为： " + Arrays.toString(strings));
+                    return Arrays.toString(strings);
 				} catch (IOException e) {
 					log.info("getcallbackip 当前访问的微信urlStr为: "+urlStr);
 					e.printStackTrace();

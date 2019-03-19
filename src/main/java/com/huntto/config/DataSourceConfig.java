@@ -1,8 +1,9 @@
 package com.huntto.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Profile;
  * Email city_wangyi@163.com<br/>
  * Create_time 2018/12/9 15:54<br/>
  */
+@Slf4j
 @Configuration
 @Profile({ "dev", "prod" })
 public class DataSourceConfig {
@@ -33,8 +35,6 @@ public class DataSourceConfig {
 //        return dataSource;
 //    }
 
-	private Logger logger = LoggerFactory.getLogger(DataSourceConfig.class);
-
 	@Value("${spring.datasource.driverClassName}")
 	String driverClassName;
 
@@ -49,7 +49,7 @@ public class DataSourceConfig {
 
 	@Bean(initMethod = "init", destroyMethod = "close", name = "dataSource")
 	public DruidDataSource ruidDataSourceBean() {
-		logger.info("-------------------init alibaba datasource config-------------------------");
+		log.info("-------------------init alibaba datasource config-------------------------");
 
 		DruidDataSource druidDataSource = new DruidDataSource();
 
@@ -58,7 +58,7 @@ public class DataSourceConfig {
 		druidDataSource.setUsername(username);
 		druidDataSource.setPassword(password);
 
-		logger.info("-------------------init alibaba datasource config done-------------------------");
+		log.info("-------------------init alibaba datasource config done-------------------------");
 
 		return druidDataSource;
 	}

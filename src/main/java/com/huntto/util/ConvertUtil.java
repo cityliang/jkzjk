@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -18,7 +20,6 @@ import java.util.*;
  * 转换工具类
  */
 public final class ConvertUtil {
-    protected static final Log log = LogFactory.getLog(ConvertUtil.class);
 
     /**
      * Checkstyle rule: utility classes should not have public constructor
