@@ -7,6 +7,7 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -18,7 +19,13 @@ public class SwaggerConfig {
 	private String basePackage = "com.huntto.controller";
 
 	// 创建人
-	private String createPerson = "CITY";
+	private String name = "CITY";
+	
+	// 创建人
+	private String url = "https://github.com/cityliang/jkzjk.git";
+	
+	// 创建人
+	private String email = "city_wangyi@163.com";
 
 	// 当前文档的标题
 	private String title = "健康证接口";
@@ -40,7 +47,7 @@ public class SwaggerConfig {
 	// 构建 api文档的详细信息函数,注意这里的注解引用的是哪个
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title(title)// 页面标题
-				.contact(createPerson)// 创建人
+				.contact(new Contact(name, url, email))// 创建人
 				.version(version)// 版本号
 				.description(description)// 描述
 				.build();
