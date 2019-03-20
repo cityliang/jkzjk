@@ -70,6 +70,8 @@ public class CyryController {
 	 * @return url 
 	 * @throws Exception
 	 */
+	@ApiOperation(value = "获取微信接口相关信息", notes = "用来获取前端需要的信息")
+	@ApiImplicitParam(paramType = "query", name = "url", value = "JS安全域名的三个之一", dataType = "String", required = true)
     @GetMapping(value = "/getWxToken")
     public String test(String url) throws Exception {
 		String access_token = wUtil.getAccess_token();

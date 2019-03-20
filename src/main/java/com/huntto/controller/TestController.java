@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
  * Email city_wangyi@163.com<br/>
  * Create_time 2018/12/8 9:16<br/>
  */
-@Api("健康证-测试接口")
+//@Api("健康证-测试接口")
 @RestController
 public class TestController {
 	@Autowired

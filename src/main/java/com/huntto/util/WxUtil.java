@@ -25,9 +25,14 @@ import com.huntto.entity.wx.AccessToken;
 import com.huntto.entity.wx.JsapiTicket;
 import com.huntto.entity.wx.WxIPList;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
+@Api("健康证-微信相关接口")
 @RestController
 public class WxUtil {
 	
@@ -39,6 +44,7 @@ public class WxUtil {
 	 *
      * @throws Exception Exception
      */
+	@ApiOperation(value = "获取微信接口AccessToken", notes = "用来获取微信的AccessToken")
 	@RequestMapping("/getAccessToken")
 	public String getAccessToken() throws Exception {
 		List<String> list = wConfig.getIplist();
@@ -58,7 +64,7 @@ public class WxUtil {
         }
         return null;
 	}
-	
+	@ApiOperation(value = "获取微信服务器IP列表", notes = "用来获取微信的服务器IP列表")
 	@RequestMapping("/getcallbackip")
 	public String getcallbackip() throws Exception {
 //		urlStr += "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token="+WeiXinUtil.ACCESS_TOKEN;
@@ -91,6 +97,7 @@ public class WxUtil {
 	 *
      * @throws Exception Exception
      */
+	@ApiOperation(value = "获取微信 JsapiTicket", notes = "用来获取微信的JsapiTicket")
 	@RequestMapping("/getJsapiTicket")
 	public String getJsapiTicket() throws Exception {
 		List<String> list = wConfig.getIplist();
@@ -113,6 +120,13 @@ public class WxUtil {
 	 * 获取签名signature
      * @throws Exception Exception
      */
+	@ApiOperation(value = "获取微信 签名", notes = "用来获取微信的签名")
+	@ApiImplicitParams({
+		@ApiImplicitParam(paramType = "query", name = "noncestr", value = "随机字符串", dataType = "String", required = true),
+		@ApiImplicitParam(paramType = "query", name = "tsapiTicket", value = "微信的JsapiTicket", dataType = "String", required = true),
+		@ApiImplicitParam(paramType = "query", name = "timestamp", value = "10位时间戳", dataType = "String", required = true),
+		@ApiImplicitParam(paramType = "query", name = "url", value = "JS安全域名的三个之一", dataType = "String", required = true)
+	})
 	@RequestMapping("/getJsSdkSign")
 	public String getJsSdkSign(String noncestr,String tsapiTicket,String timestamp,String url) throws Exception {
         return getJsSdkSign1(noncestr, tsapiTicket, timestamp, url);

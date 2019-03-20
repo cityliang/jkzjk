@@ -196,13 +196,42 @@
 
 
 	<build>
-		<finalName>jkzjk-jkzjkww</finalName>
+		<finalName>jkzjk-jkzjkww8085</finalName>
 		<!-- <resources>
 			<resource>
 				<directory>src\main\resources</directory>
 			</resource>
 		</resources> -->
 		<plugins>
+			<plugin>
+			    <artifactId>maven-assembly-plugin</artifactId>
+			    <configuration>
+			         <!-- 打包后的包名是否包含assembly的id名 -->
+			        <appendAssemblyId>false</appendAssemblyId>
+			          <!-- 指定最后tar或者zip包的名字 -->
+			          <finalName>jkzjkww8085</finalName>
+			          <!-- tar或者zip包的输出目录 -->
+			          <!-- ../ 是指当前项目的根目录 ，例如：F:\pvpsddp\pvpsddp-gateway 的上一级-->
+			          <outputDirectory>C:\STS\jkzjk\target</outputDirectory>
+			        <descriptors>
+			              <!-- 引用的assembly配置文件，可以用多个，即可以同时打包多个格式的包 -->
+			            <descriptor>src/main/resources/assembly.xml</descriptor>
+			        </descriptors>
+			    </configuration>
+			    <executions>
+			      <!-- phase加入package后，则在执行maven package时就可以调用maven-assembly-plugin插件定义的打包方式 -->
+			        <execution>
+			          <!--名字任意 -->
+			            <id>make-assembly</id>
+			           <!-- 绑定到package生命周期阶段上 -->
+			            <phase>package</phase>
+			            <goals>
+			               <!-- 只运行一次 --> 
+			                <goal>single</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			</plugin>
 			<plugin> <!-- 该插件的主要功能是配置编译插件及jdk版本 编码格式等 -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -312,36 +341,6 @@
 		            </execution>
 		        </executions>
 		    </plugin> -->
-		    
-		    <plugin>
-			    <artifactId>maven-assembly-plugin</artifactId>
-			    <configuration>
-			         <!-- 打包后的包名是否包含assembly的id名 -->
-			        <appendAssemblyId>false</appendAssemblyId>
-			          <!-- 指定最后tar或者zip包的名字 -->
-			          <finalName>jkzjkww</finalName>
-			          <!-- tar或者zip包的输出目录 -->
-			          <!-- ../ 是指当前项目的根目录 ，例如：F:\pvpsddp\pvpsddp-gateway 的上一级-->
-			          <outputDirectory>C:\STS\jkzjk\target</outputDirectory>
-			        <descriptors>
-			              <!-- 引用的assembly配置文件，可以用多个，即可以同时打包多个格式的包 -->
-			            <descriptor>src/main/resources/assembly.xml</descriptor>
-			        </descriptors>
-			    </configuration>
-			    <executions>
-			      <!-- phase加入package后，则在执行maven package时就可以调用maven-assembly-plugin插件定义的打包方式 -->
-			        <execution>
-			          <!--名字任意 -->
-			            <id>make-assembly</id>
-			           <!-- 绑定到package生命周期阶段上 -->
-			            <phase>package</phase>
-			            <goals>
-			               <!-- 只运行一次 --> 
-			                <goal>single</goal>
-			            </goals>
-			        </execution>
-			    </executions>
-			</plugin>
 		</plugins>
 	</build>
 </project>
