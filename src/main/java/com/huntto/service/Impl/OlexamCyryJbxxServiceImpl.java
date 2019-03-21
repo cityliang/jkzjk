@@ -419,6 +419,10 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         				img1 = PHOTO;
         				img2 = Base64.encodeBase64String(cyryVo3.getPHOTO());
         				FaceDetectResult fDetectResult = faceRecognUtil.faceDetect(img1);
+        				if(fDetectResult == null) {
+    						map.put("msg", "人脸识别接口请求失败！");
+        					return map;
+    					}
         				if(fDetectResult.getErrno() == 0) {
         					if (fDetectResult.getFace_num() == 0) {
         						map.put("msg", "请传入带有人脸的图片");
@@ -475,6 +479,10 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         					img2 = Base64.encodeBase64String(cyryVo.getPHOTO());
         					
         					FaceDetectResult fDetectResult = faceRecognUtil.faceDetect(img1);
+        					if(fDetectResult == null) {
+        						map.put("msg", "人脸识别接口请求失败！");
+            					return map;
+        					}
             				if(fDetectResult.getErrno() == 0) {
             					if (fDetectResult.getFace_num() == 0) {
             						map.put("msg", "请传入带有人脸的图片");

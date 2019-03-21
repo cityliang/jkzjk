@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,25 +75,34 @@ public class CyryController {
 	@ApiImplicitParam(paramType = "query", name = "url", value = "JS安全域名的三个之一", dataType = "String", required = true)
     @GetMapping(value = "/getWxToken")
     public String test(String url) throws Exception {
-		String access_token = wUtil.getAccess_token();
-		String ticket = wUtil.getWXJsapiTicket();
-		String timestamp = WxUtil.getTimestamp();
-		String nonceStr = WxUtil.getNoncestr();
-		String signature = wxUtil.getJsSdkSign(nonceStr, ticket, timestamp, url);
-		log.info("url："+url);
-		log.info("access_token："+access_token);
-		log.info("timestamp："+timestamp);
-		log.info("ticket："+ticket);
-		log.info("nonceStr："+nonceStr);
-		log.info("signature："+signature);
-        Map map = new HashMap<>();
-		map.put("access_token", access_token);
-		map.put("ticket", ticket);
-		map.put("appId", wConfig.getAPPID());
-		map.put("timestamp", timestamp);
-		map.put("nonceStr", nonceStr);
-		map.put("signature", signature);
-		return JsonUtil.toJSon(map);
+		String access_token = null;
+		String ticket = null;
+		try {
+			access_token = wUtil.getAccess_token();
+			ticket = wUtil.getWXJsapiTicket();
+			String timestamp = WxUtil.getTimestamp();
+			String nonceStr = WxUtil.getNoncestr();
+			String signature = wxUtil.getJsSdkSign(nonceStr, ticket, timestamp, url);
+			log.info("url："+url);
+			log.info("access_token："+access_token);
+			log.info("timestamp："+timestamp);
+			log.info("ticket："+ticket);
+			log.info("nonceStr："+nonceStr);
+			log.info("signature："+signature);
+			Map map = new HashMap<>();
+			map.put("access_token", access_token);
+			map.put("ticket", ticket);
+			map.put("appId", wConfig.getAPPID());
+			map.put("timestamp", timestamp);
+			map.put("nonceStr", nonceStr);
+			map.put("signature", signature);
+			return JsonUtil.toJSon(map);
+		} catch (IOException e) {
+			log.info("连接超时。。。。。");
+			log.info("access_token："+access_token);
+			log.info("ticket："+ticket);
+		}
+		return url;
     }
 	
 	/**

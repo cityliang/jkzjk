@@ -36,9 +36,11 @@ public class WxScheduled {
 		
 		log.info("定时任务执行前的 ACCESS_TOKEN: "+wUtil.WX_ACCESS_TOKEN);
 		log.info("定时任务执行前的 TICKET: "+wUtil.WX_TICKET);
-		String token=wxUtil.getAccessToken();
+//		String token=wxUtil.getAccessToken();
+		String token = wUtil.getAccess_token();
 		wUtil.WX_ACCESS_TOKEN = token;
-		String jsTicket=wxUtil.getJsapiTicket();
+//		String jsTicket=wxUtil.getJsapiTicket();
+		String jsTicket = wUtil.getWXJsapiTicket();
 		wUtil.WX_TICKET = jsTicket;
 		log.info("定时获取微信执行了"+count+"次");
 		count++;

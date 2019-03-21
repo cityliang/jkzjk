@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 import com.huntto.config.FaceRecognConfig;
 import com.huntto.entity.face.FaceDetectResult;
 import com.huntto.entity.face.FaceVerifyResult;
+import com.huntto.util.WeiXinUtil.TrustAnyHostnameVerifier;
 
 import lombok.Data;
 
@@ -89,6 +91,8 @@ public class FaceRecognUtil {
            // 发送POST请求必须设置如下两行
            conn.setDoOutput(true);
            conn.setDoInput(true);
+           HttpsURLConnection httpConnection = (HttpsURLConnection) conn;
+           httpConnection.setHostnameVerifier(new WeiXinUtil().new TrustAnyHostnameVerifier());
            // 获取URLConnection对象对应的输出流
            out = new PrintWriter(conn.getOutputStream());
            // 发送请求参数
@@ -96,11 +100,11 @@ public class FaceRecognUtil {
            // flush输出流的缓冲
            out.flush();
            // 定义BufferedReader输入流来读取URL的响应
-           statusCode = ((HttpURLConnection)conn).getResponseCode();
+           statusCode = ((HttpsURLConnection)httpConnection).getResponseCode();
            if(statusCode != 200) {
-               in = new BufferedReader(new InputStreamReader(((HttpURLConnection)conn).getErrorStream()));
+               in = new BufferedReader(new InputStreamReader(((HttpsURLConnection)httpConnection).getErrorStream()));
            } else {
-               in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+               in = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
            }
            String line;
            while ((line = in.readLine()) != null) {
@@ -167,6 +171,8 @@ public class FaceRecognUtil {
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);
+            HttpsURLConnection httpConnection = (HttpsURLConnection) conn;
+            httpConnection.setHostnameVerifier(new WeiXinUtil().new TrustAnyHostnameVerifier());
             // 获取URLConnection对象对应的输出流
             out = new PrintWriter(conn.getOutputStream());
             // 发送请求参数
@@ -174,11 +180,11 @@ public class FaceRecognUtil {
             // flush输出流的缓冲
             out.flush();
             // 定义BufferedReader输入流来读取URL的响应
-            statusCode = ((HttpURLConnection)conn).getResponseCode();
+            statusCode = ((HttpsURLConnection)conn).getResponseCode();
             if(statusCode != 200) {
-                in = new BufferedReader(new InputStreamReader(((HttpURLConnection)conn).getErrorStream()));
+                in = new BufferedReader(new InputStreamReader(((HttpsURLConnection)httpConnection).getErrorStream()));
             } else {
-                in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                in = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
             }
             String line;
             while ((line = in.readLine()) != null) {

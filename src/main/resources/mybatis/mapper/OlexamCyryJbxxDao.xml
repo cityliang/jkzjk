@@ -38,7 +38,7 @@
 	</update>
 	<!-- 通过从业人员姓名查询从业人员信息 -->
 	<select id="getCYRYbyName" parameterType="java.lang.String" resultMap="CYRYVOMap3">
-		select t.XM,t.IDCARD,t.PHOTO,t.FEATURE from CYRYQUERY t
+		select t.XM,t.IDCARD,t.PHOTO from CYRYQUERY t
 				where t.XM = #{XM} 
         			order by t.FZSJ desc
 	</select>
