@@ -420,29 +420,33 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         				img2 = Base64.encodeBase64String(cyryVo3.getPHOTO());
         				FaceDetectResult fDetectResult = faceRecognUtil.faceDetect(img1);
         				if(fDetectResult == null) {
+        					log.info("人脸识别接口请求失败！");
     						map.put("msg", "人脸识别接口请求失败！");
         					return map;
     					}
         				if(fDetectResult.getErrno() == 0) {
         					if (fDetectResult.getFace_num() == 0) {
+        						log.info("未传入带有人脸的图片");
         						map.put("msg", "请传入带有人脸的图片");
             					return map;
 							}else if(fDetectResult.getFace_num() > 0) {
 		        				FaceVerifyResult fVerifyResult =  faceRecognUtil.faceVerify(img1, img2);
-		        				log.info("result : "+fVerifyResult);
 		        				if(fVerifyResult.getErrno() == 0) {
 		        					if(fVerifyResult.getConfidence() > 67.05F) {//confidence > 60.03时误识率< 1/1000, confidence > 67.05时误识率< 1/10000, confidence > 75.45时误识率< 1/100000, 
 		        						return getJKZXXbyIdcard(cyryVo3.getIDCARD());
 		        					}else {
+		        						log.info("未查询到相匹配的人员信息");
 		        						map.put("msg", "未查询到相匹配的人员信息");
 		            					return map;
 		        					}
 		    					}else {
+		    						log.info("人脸识别接口请求失败！");
 		    						map.put("msg", "人脸识别接口请求失败！");
 		        					return map;
 		    					}
 							}
         				}else {
+        					log.info("人脸检测接口请求失败！");
         					map.put("msg", "人脸检测接口请求失败！");
         					return map;
         				}
@@ -480,24 +484,27 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
         					
         					FaceDetectResult fDetectResult = faceRecognUtil.faceDetect(img1);
         					if(fDetectResult == null) {
+        						log.info("人脸识别接口请求失败！");
         						map.put("msg", "人脸识别接口请求失败！");
             					return map;
         					}
             				if(fDetectResult.getErrno() == 0) {
             					if (fDetectResult.getFace_num() == 0) {
+            						log.info("未传入带有人脸的图片");
             						map.put("msg", "请传入带有人脸的图片");
                 					return map;
     							}else if(fDetectResult.getFace_num() > 0) {
     	        					FaceVerifyResult fVerifyResult =  faceRecognUtil.faceVerify(img1, img2);
-    	        					log.info("result "+i+" : "+fVerifyResult);
     	        					if(fVerifyResult.getErrno() == 0) {
     	        						map1.put(fVerifyResult.getConfidence(), cyryVo.getIDCARD());
     	        					}else {
+    	        						log.info("人脸识别接口请求失败！");
     	        						map.put("msg", "人脸识别接口请求失败！");
     	            					return map;
     	        					}
     							}
             				}else {
+            					log.info("人脸检测接口请求失败！");
             					map.put("msg", "人脸检测接口请求失败！");
             					return map;
             				}
@@ -511,9 +518,7 @@ public class OlexamCyryJbxxServiceImpl implements OlexamCyryJbxxService {
 //            					return map;
 //        					}
         				} else {
-        					log.info("数据库人员头像图片为空，请确认该人员是否录入头像！");
-        					map.put("msg", "数据库人员头像图片为空，请确认该人员是否录入头像！");
-        					return map;
+        					log.info("数据库人员头像图片为空，请确认该人员是否录入头像！该人员身份证号为 :" + cyryVo.getIDCARD());
         				}
         			}
                     if (!"{}".equals(map1.toString())) {
