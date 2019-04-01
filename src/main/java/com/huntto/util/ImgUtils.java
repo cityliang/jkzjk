@@ -54,7 +54,7 @@ public class ImgUtils {
 			double ratio = 0.0; // 缩放比例
 			File f = new File(srcImageFile);
 			BufferedImage bi = ImageIO.read(f);
-			Image itemp = bi.getScaledInstance(width, height, bi.SCALE_SMOOTH);// bi.SCALE_SMOOTH
+			Image itemp = bi.getScaledInstance(width, height, Image.SCALE_SMOOTH);// bi.SCALE_SMOOTH
 																				// 选择图像平滑度比缩放速度具有更高优先级的图像缩放算法。
 			// 计算比例
 			if ((bi.getHeight() > height) || (bi.getWidth() > width)) {
