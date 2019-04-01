@@ -196,7 +196,7 @@
 
 
 	<build>
-		<finalName>jkzjk-jkzjkww8085</finalName>
+		<finalName>jkzjk-jkzjkww8082</finalName>
 		<!-- <resources>
 			<resource>
 				<directory>src\main\resources</directory>
@@ -209,7 +209,7 @@
 			         <!-- 打包后的包名是否包含assembly的id名 -->
 			        <appendAssemblyId>false</appendAssemblyId>
 			          <!-- 指定最后tar或者zip包的名字 -->
-			          <finalName>jkzjkww8085</finalName>
+			          <finalName>jkzjkww8082</finalName>
 			          <!-- tar或者zip包的输出目录 -->
 			          <!-- ../ 是指当前项目的根目录 ，例如：F:\pvpsddp\pvpsddp-gateway 的上一级-->
 			          <outputDirectory>C:\STS\jkzjk\target</outputDirectory>
