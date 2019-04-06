@@ -3,6 +3,10 @@
 # Compiled class file
 *.class
 
+.classpath
+.project
+pictures/
+
 # Log file
 *.log
 
