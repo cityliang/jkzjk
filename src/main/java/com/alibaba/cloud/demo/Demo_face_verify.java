@@ -16,6 +16,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import net.coobird.thumbnailator.Thumbnails;
 /**
  * 线上人脸对比demo
  */
@@ -147,8 +148,32 @@ public class Demo_face_verify {
         String ak_id = "LTAIpfMXLqPGY81V"; //用户ak
         String ak_secret = "Fxrwy8YeBjviLI4zivYWWsjF7oqVLR"; // 用户ak_secret
         String url = "https://dtplus-cn-shanghai.data.aliyuncs.com/face/verify"; //参考：https://face.data.aliyun.com/console
-        String body = "{type\":0,\"image_url_1\":\"http://e.hiphotos.baidu.com/image/pic/item/dbb44aed2e738bd4d78823fba88b87d6267ff94b.jpg\",\"image_url_2\":\"http://e.hiphotos.baidu.com/image/pic/item/dbb44aed2e738bd4d78823fba88b87d6267ff94b.jpg\"}";//参考：https://help.aliyun.com/knowledge_detail/53520.html?spm=5176.7753399.6.553.i4Hm7s";
-        System.out.println("response body:" + sendPost(url, body, ak_id, ak_secret));
-
+//        String body = "{type\":0,\"image_url_1\":\"https://note.youdao.com/yws/public/resource/45ade8b443dccfa0127d49cc769250f5/xmlnote/WEBRESOURCE13f101affe5e46c8aaf5aa672422659e/1859\",\"image_url_2\":\"https://note.youdao.com/yws/public/resource/45ade8b443dccfa0127d49cc769250f5/xmlnote/WEBRESOURCE2ef5ca99ca150dfce1ecd6ef143ff7ae/1869\"}";//参考：https://help.aliyun.com/knowledge_detail/53520.html?spm=5176.7753399.6.553.i4Hm7s";
+//        System.out.println("response body:" + sendPost(url, body, ak_id, ak_secret));
+        
+        
+        byte[] imageData1 = Utils.loadFile(Utils.PICTURE_ROOT + "5.jpg");
+        System.out.println("imageData1 length: "+imageData1.length);
+        String img1 =  Base64.encodeBase64String(imageData1);
+        System.out.println("img2 length: "+img1.length());
+//        ImgUtils.scale(Utils.PICTURE_ROOT + "4.jpg", Utils.PICTURE_ROOT + "5.jpg", 128, 128, true);// 等比例缩放 输出缩放图片
+        byte[] imageData2 = Utils.loadFile(Utils.PICTURE_ROOT + "3.jpg");
+        System.out.println("imageData2 length: "+imageData2.length);
+        String img2 =  Base64.encodeBase64String(imageData2);
+        System.out.println("img2 length: "+img2.length());
+        Thumbnails.of(Utils.PICTURE_ROOT + "2.jpg").scale(1f).outputQuality(0.5f).toFile(Utils.PICTURE_ROOT + "3.jpg");
+//        Thumbnails.of(Utils.PICTURE_ROOT + "1.jpg").scale(1f).outputQuality(0.75f).toFile(Utils.PICTURE_ROOT + "75.jpg");
+//        Thumbnails.of(Utils.PICTURE_ROOT + "1.jpg").scale(1f).outputQuality(0.5f).toFile(Utils.PICTURE_ROOT + "50.jpg");
+//        Thumbnails.of(Utils.PICTURE_ROOT + "1.jpg").scale(1f).outputQuality(0.25f).toFile(Utils.PICTURE_ROOT + "25.jpg");
+//        byte[] imageData3 = Utils.loadFile(Utils.PICTURE_ROOT + "5.jpg");
+//        System.out.println("imageData3 length: "+imageData3.length);
+//        String img3 =  Base64.encodeBase64String(imageData3);
+//        System.out.println();
+//        System.out.println("img3 length: "+img3.length());
+        
+////        
+//        String body = "{\"type\":\"1\",\"content_1\":\""+img1+"\",\"content_2\":\""+img2+"\"}";
+//        System.out.println("response body:" + sendPost(url, body, ak_id, ak_secret));
+//        
     }
 }

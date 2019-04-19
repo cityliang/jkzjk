@@ -14,6 +14,71 @@ import org.apache.log4j.Logger;
 public class FileUtil {
 
 	private static Logger log = Logger.getLogger(FileUtil.class);
+	
+	
+	//	public static String getPath(String str) {
+	//	StringBuilder sb = new StringBuilder();
+	//	sb.append("D:\\IMG\\idcard\\" + str + ".jpg");
+	//	return sb.toString();
+	//}
+	//public static String getCYRYQUERYPath(String str) {
+	//	StringBuilder sb = new StringBuilder();
+	//	sb.append("D:\\IMG\\CYRYQUERY\\" + str + ".jpg");
+	//	return sb.toString();
+	//}
+	//public static String getCYRYJBXXPath(String str) {
+	//	StringBuilder sb = new StringBuilder();
+	//	sb.append("D:\\IMG\\CYRYJBXX\\" + str + ".jpg");
+	//	return sb.toString();
+	//}
+	
+	public static String getPath(String str) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("C:\\IMG\\idcard\\" + str + ".jpg");
+		return sb.toString();
+	}
+	public static String getCYRYQUERYPath(String str) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("C:\\IMG\\CYRYQUERY\\" + str + ".jpg");
+		return sb.toString();
+	}
+	public static String getCYRYJBXXPath(String str) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("C:\\IMG\\CYRYJBXX\\" + str + ".jpg");
+		return sb.toString();
+	}
+	/**
+	 * 把图片写入目标路径
+	 * @param sourcePath 图片地址
+	 * @param bytes 图片字节流
+	 */
+	public static void genPhoto(String sourcePath, byte[] bytes) {
+		File desk = new File(sourcePath);
+		if (!desk.exists()) {
+			// 先得到文件的上级目录，并创建上级目录，在创建文件
+			desk.getParentFile().mkdirs();
+			try {
+				desk.createNewFile();// 创建文件
+			} catch (IOException e) {
+				log.info("创建文件失败" + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		// 生成jpeg图片
+		FileImageOutputStream out;
+		try {
+			out = new FileImageOutputStream(new File(sourcePath));
+			out.write(bytes);
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			log.info("文件不存在,没有找到该文件：" + e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.info("文件读取错误：" + e.getMessage());
+		}
+	}
 
 	/**
 	 * 同步图片
@@ -41,7 +106,7 @@ public class FileUtil {
 			log.info("图片复制成功");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			log.info("文件不存在：" + e.getMessage());
+			log.info("文件不存在,没有找到该文件：" + e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.info("文件读取错误：" + e.getMessage());

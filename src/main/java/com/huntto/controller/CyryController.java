@@ -186,11 +186,15 @@ public class CyryController {
 	})
 	@RequestMapping(value = { "/getPersonMsg" }, method = RequestMethod.POST)
 	public String getPersonMsg3(String NAME,String idCard) throws JsonProcessingException {
+		long start222 = System.currentTimeMillis();
 		Map map;
 		String json = "";
 		ObjectMapper mapper;
 		if(Nulls.isNotEmpty(NAME) && Nulls.isEmpty(idCard)) {// 姓名不为空，身份证号为空
+			long start = System.currentTimeMillis();
 			map = olexamCyryJbxxService.getCYRYbyName1(NAME);
+			long end = System.currentTimeMillis();
+			log.info("使用姓名查询 getCYRYbyName1 方法执行花费时间"+(end - start));
 			if(map.containsKey("list")) {
 				List<CyryVo1> list = (List<CyryVo1>)map.get("list");
 //				List<CyryVo2> list2 = new ArrayList<>();
@@ -220,8 +224,10 @@ public class CyryController {
 //				} else {
 //					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
 //				}
-				
+				long start1 = System.currentTimeMillis();
 				map = toMapList(list,map);
+				long end1 = System.currentTimeMillis();
+				log.info("使用姓名查询 getCYRYbyName1 方法转换执行花费时间1"+(end1 - start1));
 				if (null != map && !"{}".equals(map.toString())) {
 					mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
@@ -237,11 +243,11 @@ public class CyryController {
 					mapper = new ObjectMapper();
 					json = mapper.writeValueAsString(map);
 				}
-				} else if ("{}".equals(map.toString())) {
-					json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
-				} else {
-					json = JsonUtil.jsonStr("msg", "该用户没有健康证");
-				}
+			} else if ("{}".equals(map.toString())) {
+				json = JsonUtil.jsonStr("msg", "未查到该人员信息或在办理中");
+			} else {
+				json = JsonUtil.jsonStr("msg", "该用户没有健康证");
+			}
 		}else if((Nulls.isNotEmpty(NAME) && Nulls.isNotEmpty(idCard)) || 
 				 (Nulls.isEmpty(NAME) && Nulls.isNotEmpty(idCard))) {// 姓名不为空，身份证号不为空 或 姓名为空，身份证号不为空 
 			if (Nulls.validateValue(idCard) && IdCardUtil.isIdcard(idCard)) {
@@ -264,7 +270,8 @@ public class CyryController {
 		}else if(Nulls.isEmpty(NAME) && Nulls.isEmpty(idCard)) {// 姓名为空，身份证号为空
 			json = JsonUtil.jsonStr("msg", "姓名和身份证不正确，请输入正确的姓名和身份证");
 		}
-
+		long end333 = System.currentTimeMillis();
+		log.info("通过姓名或身份证查询总共花费"+(end333 - start222));
 		return json;
 	}
 
@@ -281,7 +288,9 @@ public class CyryController {
                         cyryVo2.setXM("");
                     }
                     if (StringUtils.isNoneBlank(cyryVo1.getIDCARD())) {
-                        cyryVo2.setIDCARD(cyryVo1.getIDCARD());
+                    	// 加密身份证号 改到前端做
+//                    	cyryVo2.setIDCARD(cyryVo1.getIDCARD().replaceAll("(\\d{4})\\d{10}(\\d{4})","$1****$2"));
+                    	cyryVo2.setIDCARD(cyryVo1.getIDCARD());
                     } else {
                         cyryVo2.setIDCARD("");
                     }
@@ -421,6 +430,7 @@ public class CyryController {
 	@RequestMapping(value = { "/faceRecognition" }, method = RequestMethod.POST)
 	public String faceRecognition(String NAME,String PHOTO) throws JsonProcessingException {
         String json;
+        long start = System.currentTimeMillis();
         if (Nulls.validateValue(NAME,PHOTO)) {
 			Map map = olexamCyryJbxxService.verifyPicture(NAME,PHOTO);
 			if (null != map && !"{}".equals(map.toString())) {
@@ -441,6 +451,8 @@ public class CyryController {
 		} else {
 			json = JsonUtil.jsonStr("msg", "姓名和头像不正确，请重试！");
 		}
+        long end = System.currentTimeMillis();
+        log.info("通过人脸识别接口总花费时间："+(end - start));
 		return json;
 	}
 	
